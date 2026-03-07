@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nómina Puerta de Hierro</title>
+<meta name="description" content="Nomina$ Puerta de Hierro: calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas." />
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nomina$">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+
+<meta property="og:title" content="Nomina$ Puerta de Hierro">
+<meta property="og:description" content="Calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dgutim.github.io/nominas/index.html">
+<meta property="og:site_name" content="Nomina$ Puerta de Hierro">
+<meta property="og:image" content="https://dgutim.github.io/nominas/preview.png">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nomina$ Puerta de Hierro">
+<meta name="twitter:description" content="Calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas.">
+<meta name="twitter:image" content="https://dgutim.github.io/nominas/preview.png">
+<style>
+  :root {
+    --bg: #f8fafc; --card: #ffffff; --ink: #0f172a; --muted: #475569; --line: #e2e8f0;
+    --brand: #0f766e; --brand2: #0ea5a4; --soft: #ecfeff; --soft2: #f8fafc; --warn:#7c2d12; --warn-bg:#fff7ed;
+    --ok:#166534; --ok-bg:#f0fdf4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--ink);
+    background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 120px);
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 14px 64px; }
+  .hero {
+    background: linear-gradient(135deg, #0f172a, #134e4a); color:#fff; border-radius:22px; padding:20px;
+    box-shadow:0 20px 45px rgba(15,23,42,.16); margin-bottom:18px;
+  }
+  .hero h1 { margin:0; font-size:30px; letter-spacing:-.03em; }
+  .hero p { margin:8px 0 0; color:rgba(255,255,255,.85); }
+  .top-actions {
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;
+  }
+  .card, .totals {
+    background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px;
+    box-shadow:0 8px 24px rgba(15,23,42,.05); margin-bottom:16px;
+  }
+  .card h2 { margin:0 0 6px; font-size:20px; letter-spacing:-.02em; }
+  .card h3 { margin:0 0 12px; font-size:17px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:14px; }
+  .grid { display:grid; gap:12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-3 { display:grid; gap:12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  label { font-size:14px; font-weight:600; }
+  input, select, button {
+    width:100%; border:1px solid #cbd5e1; border-radius:14px; padding:12px 13px; font-size:16px;
+    background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus, button:focus {
+    outline:3px solid rgba(14,165,164,.18); border-color:var(--brand2);
+  }
+  .money { font-variant-numeric: tabular-nums; font-weight:700; font-size:19px; }
+  .inline-total {
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:12px 14px; background:#f8fafc; border:1px solid var(--line); border-radius:16px; margin-top:14px;
+  }
+  .muted { color:var(--muted); font-size:13px; }
+  .summary-row {
+    display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .summary-row:last-child { border-bottom:none; }
+  .summary-row strong { font-size:17px; }
+  .grand { margin-top:12px; padding-top:14px; border-top:2px solid var(--ink); }
+  .warn {
+    margin-top:12px; background:var(--warn-bg); border:1px solid #fed7aa; border-radius:14px;
+    padding:12px 14px; color:var(--warn); font-size:14px;
+  }
+  .ok {
+    margin-top:12px; background:var(--ok-bg); border:1px solid #bbf7d0; border-radius:14px;
+    padding:12px 14px; color:var(--ok); font-size:14px; display:none;
+  }
+  .detail-block {
+    border:1px solid var(--line); border-radius:18px; padding:16px; background:#fcfcfd; margin-top:10px;
+  }
+  .pill {
+    display:inline-flex; align-items:center; gap:8px; background:var(--soft); color:#155e75; border:1px solid #bae6fd;
+    border-radius:999px; padding:8px 12px; font-size:13px; font-weight:600;
+  }
+  .surgery-list { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .surgery-item {
+    display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px dashed #e5e7eb;
+  }
+  .surgery-item:last-child { border-bottom:none; }
+  .btn { background:var(--ink); color:#fff; border:none; font-weight:700; cursor:pointer; }
+  .btn.secondary { background:#fff; color:var(--ink); border:1px solid #cbd5e1; }
+  .btn.small { width:auto; padding:10px 12px; font-size:14px; }
+  .right { text-align:right; }
+
+  .soft-note {
+    margin-top:10px; font-size:13px; color:var(--muted);
+  }
+  .subtotal-line { margin-top:6px; font-size:13px; color:var(--muted); font-weight:600; }
+  .danger {
+    margin-top:12px; background:#fef2f2; border:1px solid #fecaca; border-radius:14px;
+    padding:12px 14px; color:#991b1b; font-size:14px; display:none;
+  }
+  .totals {
+    border:2px solid #c7d2fe;
+    box-shadow:0 12px 28px rgba(15,23,42,.08);
+  }
+  .totals .grand strong, .totals .grand span strong { font-size:20px; }
+  .totals .summary-row:last-child strong { font-size:20px; }
+
+  @media (max-width: 760px) {
+    .grid, .grid-3 { grid-template-columns:1fr; }
+    .hero h1 { font-size:28px; }
+    .inline-total { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Nomina$ Puerta de Hierro</h1>
+      <p>Calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas.</p>
+      <div class="top-actions">
+        <button type="button" class="btn small secondary" id="btnReset">Reiniciar cálculo</button>
+        
+        
+        
+        <button type="button" class="btn small" id="btnCopy">Copiar resumen</button>
+      </div>
+      <div id="copyNotice" class="ok">Resumen copiado.</div>
+    </section>
+
+    <section class="card">
+      <h2>Sueldo Base + complementos</h2>
+      <div class="sub">Sueldo base, complementos y productividades precargados y editables.</div>
+      <div class="grid">
+        <div class="field">
+          <label for="salarioBase">Sueldo base (€)</label>
+          <input id="salarioBase" type="text" inputmode="decimal" value="1.387,24" />
+        </div>
+        <div class="field">
+          <label for="jornada">Jornada (%)</label>
+          <input id="jornada" type="text" inputmode="decimal" value="100" placeholder="100" />
+          <div class="muted">100% = jornada completa</div>
+        </div>
+        <div class="field">
+          <label for="numTrienios">Trienios</label>
+          <select id="numTrienios"></select>
+        </div>
+        <div class="field">
+          <label for="complementoDestino">Complemento destino (€)</label>
+          <input id="complementoDestino" type="text" inputmode="decimal" value="729,14" />
+        </div>
+        <div class="field">
+          <label for="complementoEspecifico">Complemento específico (€)</label>
+          <input id="complementoEspecifico" type="text" inputmode="decimal" value="472,08" />
+        </div>
+        <div class="field">
+          <label for="productividadFija">Productividad fija (€)</label>
+          <input id="productividadFija" type="text" inputmode="decimal" value="553,00" />
+        </div>
+        <div class="field">
+          <label for="productividadVinculacion">Productividad por vinculación (€)</label>
+          <input id="productividadVinculacion" type="text" inputmode="decimal" value="488,80" />
+        </div>
+        <div class="field">
+          <label for="productividadAMS">Productividad fija AMS (€)</label>
+          <input id="productividadAMS" type="text" inputmode="decimal" value="396,61" />
+        </div>
+      </div>
+      <div class="inline-total">
+        <div>
+          <div class="muted">Trienios calculados automáticamente</div>
+          <div id="detalleTrienios" class="money">0,00 €</div>
+          <div class="soft-note">Base completa antes de jornada: <strong id="baseCompletaInfo">0,00 €</strong></div>
+        </div>
+        <div class="right">
+          <div class="muted">Bruto Sueldo Base + complementos ajustado por jornada</div>
+          <div id="totalBase" class="money">0,00 €</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Guardias</h2>
+      <div class="sub">Escribe cuántas has hecho de cada tipo. El precio queda oculto dentro del cálculo.</div>
+      <div class="grid">
+        <div class="field">
+          <label for="gLocDiario">Localizada diario</label>
+          <input id="gLocDiario" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal localizada diario: <span id="subtotalLocDiario">0,00 €</span></div>
+        </div>
+        <div class="field">
+          <label for="gPresDiario">Presencia diario</label>
+          <input id="gPresDiario" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal presencia diario: <span id="subtotalPresDiario">0,00 €</span></div>
+        </div>
+        <div class="field">
+          <label for="gLocFestivo">Localizada festivo</label>
+          <input id="gLocFestivo" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal localizada festivo: <span id="subtotalLocFestivo">0,00 €</span></div>
+        </div>
+        <div class="field">
+          <label for="gPresFestivo">Presencia festivo</label>
+          <input id="gPresFestivo" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal presencia festivo: <span id="subtotalPresFestivo">0,00 €</span></div>
+        </div>
+      </div>
+      <div class="inline-total">
+        <div class="muted">Bruto Guardias</div>
+        <div id="totalGuardias" class="money">0,00 €</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Trimestral trasplante</h2>
+      <div class="sub">Rellénalo solo cuando corresponda.</div>
+      <div class="field">
+        <label for="trasplante">Importe trimestral trasplante (€)</label>
+        <input id="trasplante" type="text" inputmode="decimal" placeholder="0,00" />
+      </div>
+      <div class="inline-total">
+        <div class="muted">Bruto Trimestral trasplante</div>
+        <div id="totalTrasplante" class="money">0,00 €</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Peonadas</h2>
+      <div class="sub">Puedes reconstruir procedimientos del mes y, además, meter aparte un total manual del mes si ya lo tienes calculado.</div>
+
+      <div class="detail-block">
+        <h3>Peonadas por detalle</h3>
+        <div class="sub">Añade aquí los procedimientos que recuerdes. Puedes mezclar distintas especialidades.</div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="pCategory">Especialidad / tipo de peonada</label>
+            <select id="pCategory">
+              <option value="">Selecciona</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pSurgery">Cirugía / procedimiento</label>
+            <select id="pSurgery">
+              <option value="">Selecciona</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pQty">Cantidad</label>
+            <input id="pQty" type="number" min="1" step="1" value="1" />
+          </div>
+        </div>
+        <div id="pSelectedPrice" class="soft-note">Selecciona una cirugía para ver su importe antes de añadirla.</div>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn small" id="btnAddSurgery">Añadir procedimiento</button>
+          <button type="button" class="btn small secondary" id="btnClearDetail">Vaciar detalle</button>
+        </div>
+        <div id="detailList" class="surgery-list"></div>
+        <div class="inline-total">
+          <div class="muted">Subtotal peonadas por detalle</div>
+          <div id="totalPeonadasDetalle" class="money">0,00 €</div>
+        </div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Peonadas por importe manual</h3>
+        <div class="sub">Si ya tienes calculado el total del mes, escríbelo aquí sin desglosar.</div>
+        <div class="field">
+          <label for="peonadasManual">Importe total manual de peonadas (€)</label>
+          <input id="peonadasManual" type="text" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div class="inline-total">
+          <div class="muted">Subtotal peonadas manuales</div>
+          <div id="totalPeonadasManual" class="money">0,00 €</div>
+        </div>
+      </div>
+
+      <div class="inline-total">
+        <div>
+          <div class="muted">Bruto Peonadas</div>
+          <div class="pill">Detalle + manual</div>
+        </div>
+        <div id="totalPeonadas" class="money">0,00 €</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Retención</h2>
+      <div class="sub">Introduce el porcentaje de IRPF que quieras aplicar al final sobre el bruto total.</div>
+      <div class="grid">
+        <div class="field">
+          <label for="irpf">IRPF (%)</label>
+          <input id="irpf" type="text" inputmode="decimal" placeholder="31,31" />
+        </div>
+      </div>
+      <div class="warn">El neto es una estimación práctica aplicando la retención al bruto total.</div>
+      <div id="duplicateWarning" class="danger">Atención: estás usando peonadas por detalle y también peonadas manuales. Revisa que no estés duplicando importes.</div>
+    </section>
+
+    <section class="totals">
+      <div class="summary-row"><span>Bruto Sueldo Base + complementos ajustado por jornada</span><strong id="resBase">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Guardias</span><strong id="resGuardias">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Trimestral trasplante</span><strong id="resTrasplante">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Peonadas</span><strong id="resPeonadas">0,00 €</strong></div>
+      <div class="summary-row grand"><span><strong>Bruto total</strong></span><strong id="brutoTotal">0,00 €</strong></div>
+      <div class="summary-row"><span>Retención IRPF</span><strong id="retencionTotal">0,00 €</strong></div>
+      <div class="summary-row"><span><strong>Neto estimado</strong></span><strong id="netoTotal">0,00 €</strong></div>
+    </section>
+  </div>
+
+<script>
+const PEONADAS_DATA = {"CGD (CIRUGÍA GENERAL)": [{"name": "Colecistectomía", "price": 152.8}, {"name": "Hernia inguinal/umbilical UNILATERAL", "price": 60.9}, {"name": "Hernia inguinal UNILATERAL/umbilical LAPAROSCÓPICA", "price": 122.0}, {"name": "Hernia inguinal BILATERAL", "price": 117.9}, {"name": "Hernia inguinal BILATERAL LAPAROSCÓPICA", "price": 236.0}, {"name": "Eventroplastia (abierta o laparoscópica)", "price": 230.0}, {"name": "Hemicolectomía/Sigmoidectomía", "price": 318.0}, {"name": "TAMIS (cirugía transanal mínimamente invasiva)", "price": 318.0}, {"name": "Cierre de ileostomía", "price": 152.8}, {"name": "Cirugía proctológica (hemorroide, fístula, absceso anal)", "price": 106.5}, {"name": "Tiroidectomía total", "price": 320.0}, {"name": "Hemitiroidectomía", "price": 185.0}, {"name": "Cirugía partes blandas (Lipoma)", "price": 120.0}], "COT (TRAUMATOLOGÍA Y CIRUGÍA ORTOPÉDICA) 2 QUIRÓFANOS": [{"name": "Prótesis total cadera", "price": 266.5}, {"name": "Prótesis total rodilla", "price": 266.5}, {"name": "Artroscopia de hombro + reparación hombro", "price": 282.0}, {"name": "Artroscopia SIMPLE de hombro", "price": 159.25}, {"name": "LCA (Ligamentoplastia cruzado rodilla)", "price": 282.0}, {"name": "Fractura de cadera (Clavo gamma / PPC)", "price": 206.5}, {"name": "Fractura de rodilla", "price": 206.5}, {"name": "Fractura de tibia/peroné/tobillo", "price": 206.5}, {"name": "Sutura tendón Aquiles", "price": 206.5}, {"name": "Fractura de clavícula/húmero", "price": 206.5}, {"name": "Fractura antebrazo/mano", "price": 206.5}, {"name": "Sutura tendinosa", "price": 206.5}, {"name": "Rizartrosis mano (artroplastia/artrodesis carpo-MTC)", "price": 206.5}, {"name": "Infección / Hematoma / Revisión de herida", "price": 206.5}, {"name": "Dupuytren", "price": 159.25}, {"name": "CAR (Artroscopia de rodilla)", "price": 114.75}, {"name": "Artroscopia de tobillo", "price": 114.75}, {"name": "Hallux valgus / rigidus / Metatarsalgia", "price": 105.25}, {"name": "EMO", "price": 82.25}, {"name": "Túnel del carpo", "price": 70.5}, {"name": "Dedo en resorte / Dedo en martillo", "price": 70.5}, {"name": "Quistes / Gangliones / Exóstosis", "price": 70.5}, {"name": "Infiltración intraarticular cadera", "price": 70.5}], "COT (TRAUMATOLOGÍA Y CIRUGÍA ORTOPÉDICA) 1 QUIRÓFANO": [{"name": "Prótesis total cadera", "price": 260.0}, {"name": "Prótesis total rodilla", "price": 260.0}, {"name": "Artroscopia de hombro + reparación hombro", "price": 275.0}, {"name": "Artroscopia SIMPLE de hombro", "price": 155.0}, {"name": "LCA (Ligamentoplastia cruzado rodilla)", "price": 275.0}, {"name": "Fractura de cadera (Clavo gamma / PPC)", "price": 201.5}, {"name": "Fractura de rodilla", "price": 201.5}, {"name": "Fractura de tibia/peroné/tobillo", "price": 201.5}, {"name": "Sutura tendón Aquiles", "price": 201.5}, {"name": "Fractura de clavícula/húmero", "price": 201.5}, {"name": "Fractura antebrazo/mano", "price": 201.5}, {"name": "Sutura tendinosa", "price": 201.5}, {"name": "Rizartrosis mano (artroplastia/artrodesis carpo-MTC)", "price": 201.5}, {"name": "Infección / Hematoma / Revisión de herida", "price": 201.5}, {"name": "Dupuytren", "price": 155.0}, {"name": "CAR (Artroscopia de rodilla)", "price": 112.0}, {"name": "Artroscopia de tobillo", "price": 112.0}, {"name": "Hallux valgus / rigidus / Metatarsalgia", "price": 102.5}, {"name": "EMO", "price": 80.0}, {"name": "Túnel del carpo", "price": 69.0}, {"name": "Dedo en resorte / Dedo en martillo", "price": 69.0}, {"name": "Quistes / Gangliones / Exóstosis", "price": 69.0}, {"name": "Infiltración intraarticular cadera", "price": 69.0}], "CPL (CIRUGÍA PLÁSTICA)": [{"name": "Cirugía plástica (x PROCEDIMIENTO)", "price": 320.0}], "DIG (ENDOSCOPIAS DIGESTIVAS)": [{"name": "Gastroenterología tardes (PRECIO FIJO)", "price": 400.0}, {"name": "Gastroenterología mañanas (PRECIO FIJO)", "price": 400.0}], "GIN (GINECOLOGÍA)": [{"name": "Histerectomía vaginal + cistorectocele", "price": 362.02}, {"name": "Histerectomía vaginal + cistorectocele/rectocele + TOT", "price": 362.02}, {"name": "Histerectomía vaginal + Cistocele", "price": 264.5}, {"name": "Histerectomía vaginal + Rectocele", "price": 264.5}, {"name": "Histerectomía vaginal", "price": 166.98}, {"name": "Histerectomía LAPAROSCÓPICA", "price": 333.96}, {"name": "Histerectomia x LAPAROTOMÍA", "price": 255.53}, {"name": "Miomectomía LAPAROSCÓPICA", "price": 333.96}, {"name": "Miomectomía x LAPAROTOMÍA", "price": 166.98}, {"name": "Mastectomía simple", "price": 255.53}, {"name": "Colpocleisis de LeFort", "price": 195.04}, {"name": "Cistorectocele", "price": 195.04}, {"name": "Richter (colposuspensión)", "price": 195.04}, {"name": "LAPAROTOMÍA (cualquier procedimiento)", "price": 166.98}, {"name": "Histerectomía vaginal simple", "price": 166.98}, {"name": "Histeropexia vaginal", "price": 166.98}, {"name": "Manchester (Amputación cervical)", "price": 166.98}, {"name": "Fistulectomía mamaria", "price": 97.52}, {"name": "Cistocele (Prolapso vesical)", "price": 97.52}, {"name": "Rectocele", "price": 97.52}, {"name": "Incontinencia urinaria de esfuerzo", "price": 97.52}, {"name": "Banda suburetral libre de tensión (TOT)", "price": 97.52}, {"name": "HISTEROSCOPIA QUIRÚRGICA", "price": 90.39}, {"name": "Radiofrecuencia miomas uterinos", "price": 90.39}, {"name": "Novasure (Ablación endometrial por radiofrecuencia)", "price": 90.39}, {"name": "Ligadura trompas LAPAROSCÓPICA", "price": 88.55}, {"name": "Laparoscopia ovario", "price": 88.55}, {"name": "Anexectomía unilateral o bilateral LAPAROSCÓPICA", "price": 88.55}, {"name": "Quistectomía de ovario uni o bilateral LAPAROSCÓPICA", "price": 88.55}, {"name": "Hidrosálpinx unilateral o bilateral LAPAROSCÓPICO", "price": 88.55}, {"name": "Miomas uterinos", "price": 57.04}, {"name": "Ligadura trompas", "price": 50.14}, {"name": "Conización + Vaporización láser", "price": 75.44}, {"name": "Tumorectomía mama", "price": 37.72}, {"name": "Bartholino", "price": 37.72}, {"name": "Conización", "price": 37.72}, {"name": "Vaporización láser", "price": 37.72}, {"name": "Resección vulvar", "price": 37.72}, {"name": "Resección vaginal", "price": 37.72}, {"name": "Histeroscopia diagnóstica", "price": 33.35}], "MXF (MAXILOFACIAL)": [{"name": "Extracción cordales (x PROCEDIMIENTO)", "price": 115.0}], "OFT (OFTALMOLOGÍA)": [{"name": "Cataratas (x PROCEDIMIENTO)", "price": 50.0}], "URO (UROLOGÍA)": [{"name": "HoLEP (Próstata láser)", "price": 359.0}, {"name": "RTU próstata", "price": 201.5}, {"name": "RTU próstata + RTU vejiga", "price": 201.5}, {"name": "Ureteroscopia (URS)", "price": 201.5}, {"name": "Cistolitotricia", "price": 274.38}, {"name": "Adenomectomía prostática (Millin) 1 URÓLOGO", "price": 274.38}, {"name": "Adenomectomía prostática (Millin) 2 URÓLOGOS", "price": 180.25}, {"name": "Uretrotomía endoscópica", "price": 201.5}, {"name": "Glandectomía", "price": 201.5}, {"name": "RTU vejiga", "price": 146.5}, {"name": "Hidrodistensión vesical", "price": 146.5}, {"name": "Recorte de malla de incontinencia", "price": 146.5}, {"name": "Hidrocele", "price": 145.0}, {"name": "Prótesis testicular", "price": 145.0}, {"name": "Orquiectomía", "price": 94.0}, {"name": "Circuncisión (SÓLO SI PRECISA SEDACIÓN)", "price": 28.0}], "RESONANCIA MAGNÉTICA": [{"name": "RMN sedación (PRECIO FIJO)", "price": 400.0}], "NCR (NEUROCIRUGÍA)": [{"name": "Hernia discal 1 nivel", "price": 366.24}, {"name": "Hernia discal 2 niveles", "price": 380.51}, {"name": "Hernia discal 3 niveles", "price": 399.53}], "CIRUGIA TORÁCICA": [{"name": "Segmentectomía pulmonar VATS", "price": 275.0}]};
+const PRECIO_TRIENIO = 53.39;
+const GUARDIAS = {
+  locDiario: 209.27,
+  presDiario: 418.54,
+  locFestivo: 323.52,
+  presFestivo: 647.04
+};
+const STORAGE_KEY = "nominas_pdh_v9";
+
+function parseAmount(value) {
+  if (value === null || value === undefined) return 0;
+  let s = String(value).trim();
+  if (!s) return 0;
+  s = s.replace(/€/g, "").replace(/\s/g, "");
+  const hasComma = s.includes(",");
+  const hasDot = s.includes(".");
+  if (hasComma && hasDot) {
+    if (s.lastIndexOf(",") > s.lastIndexOf(".")) {
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else {
+      s = s.replace(/,/g, "");
+    }
+  } else if (hasComma) {
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else {
+    const parts = s.split(".");
+    if (parts.length > 2) s = parts.join("");
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+function parseIntSafe(value) {
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : 0;
+}
+function formatEuro(value) {
+  return new Intl.NumberFormat("es-ES", {
+    style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+function formatNum(value) {
+  return new Intl.NumberFormat("es-ES", {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+
+function createTrienioOptions() {
+  const sel = document.getElementById("numTrienios");
+  sel.innerHTML = "";
+  for (let i = 0; i <= 10; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = i;
+    sel.appendChild(opt);
+  }
+}
+
+function fillCategoryOptions() {
+  const sel = document.getElementById("pCategory");
+  sel.innerHTML = '<option value="">Selecciona</option>';
+  Object.keys(PEONADAS_DATA).forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    sel.appendChild(opt);
+  });
+}
+
+function fillSurgeryOptions() {
+  const cat = document.getElementById("pCategory").value;
+  const sel = document.getElementById("pSurgery");
+  sel.innerHTML = '<option value="">Selecciona</option>';
+  if (!cat || !PEONADAS_DATA[cat]) return;
+  PEONADAS_DATA[cat].forEach((item, idx) => {
+    const opt = document.createElement("option");
+    opt.value = idx;
+    opt.textContent = item.name;
+    sel.appendChild(opt);
+  });
+}
+
+
+
+function updateSelectedProcedureInfo() {
+  const cat = document.getElementById("pCategory").value;
+  const surgeryIdx = document.getElementById("pSurgery").value;
+  const qty = Math.max(1, parseIntSafe(document.getElementById("pQty").value || "1"));
+  const box = document.getElementById("pSelectedPrice");
+  if (!cat || surgeryIdx === "" || !PEONADAS_DATA[cat] || !PEONADAS_DATA[cat][Number(surgeryIdx)]) {
+    box.textContent = "Selecciona una cirugía para ver su importe antes de añadirla.";
+    return;
+  }
+  const item = PEONADAS_DATA[cat][Number(surgeryIdx)];
+  box.textContent = `Importe procedimiento: ${formatEuro(item.price)} · Cantidad: ${qty} · Total a añadir: ${formatEuro(item.price * qty)}`;
+}
+
+function clearGuardias() {
+  document.getElementById("gLocDiario").value = "";
+  document.getElementById("gPresDiario").value = "";
+  document.getElementById("gLocFestivo").value = "";
+  document.getElementById("gPresFestivo").value = "";
+  recalc();
+}
+
+function clearPeonadas() {
+  getDetailState().items = [];
+  document.getElementById("pCategory").value = "";
+  fillSurgeryOptions();
+  document.getElementById("pQty").value = "1";
+  document.getElementById("peonadasManual").value = "";
+  renderDetailList();
+  updateSelectedProcedureInfo();
+  recalc();
+}
+
+function monthClean() {
+  clearGuardias();
+  document.getElementById("trasplante").value = "";
+  clearPeonadas();
+  document.getElementById("irpf").value = "";
+  recalc();
+}
+
+function getDetailState() {
+  if (!window._detailState) window._detailState = { items: [] };
+  return window._detailState;
+}
+
+function renderDetailList() {
+  const list = document.getElementById("detailList");
+  const state = getDetailState();
+  if (!state.items.length) {
+    list.innerHTML = '<div class="muted">Sin procedimientos añadidos todavía.</div>';
+  } else {
+    list.innerHTML = state.items.map((item, idx) => `
+      <div class="surgery-item">
+        <div>
+          <div><strong>${item.category}</strong></div>
+          <div class="muted">${item.name} · Cantidad: ${item.qty}</div>
+        </div>
+        <div class="right">
+          <div class="money" style="font-size:16px;">${formatEuro(item.total)}</div>
+          <button type="button" class="btn small secondary remove-detail" data-index="${idx}" style="margin-top:8px;">Quitar</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  list.querySelectorAll(".remove-detail").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseIntSafe(btn.dataset.index);
+      state.items.splice(idx, 1);
+      renderDetailList();
+      recalc();
+    });
+  });
+}
+
+function getBaseBreakdown() {
+  const salarioBase = parseAmount(document.getElementById("salarioBase").value);
+  const jornada = parseAmount(document.getElementById("jornada").value) || 100;
+  const factorJornada = jornada / 100;
+  const numTrienios = parseIntSafe(document.getElementById("numTrienios").value);
+  const trienios = numTrienios * PRECIO_TRIENIO;
+  const destino = parseAmount(document.getElementById("complementoDestino").value);
+  const especifico = parseAmount(document.getElementById("complementoEspecifico").value);
+  const prodFija = parseAmount(document.getElementById("productividadFija").value);
+  const prodVinc = parseAmount(document.getElementById("productividadVinculacion").value);
+  const prodAMS = parseAmount(document.getElementById("productividadAMS").value);
+  const baseCompleta = salarioBase + trienios + destino + especifico + prodFija + prodVinc + prodAMS;
+  const baseAjustada = baseCompleta * factorJornada;
+  document.getElementById("detalleTrienios").textContent = `${numTrienios} × ${formatNum(PRECIO_TRIENIO)} € = ${formatEuro(trienios)}`;
+  document.getElementById("baseCompletaInfo").textContent = formatEuro(baseCompleta);
+  return { baseCompleta, baseAjustada, jornada };
+}
+
+function getBaseTotal() {
+  return getBaseBreakdown().baseAjustada;
+}
+
+function getGuardiasTotal() {
+  return (
+    parseIntSafe(document.getElementById("gLocDiario").value) * GUARDIAS.locDiario +
+    parseIntSafe(document.getElementById("gPresDiario").value) * GUARDIAS.presDiario +
+    parseIntSafe(document.getElementById("gLocFestivo").value) * GUARDIAS.locFestivo +
+    parseIntSafe(document.getElementById("gPresFestivo").value) * GUARDIAS.presFestivo
+  );
+}
+
+function getTrasplanteTotal() {
+  return parseAmount(document.getElementById("trasplante").value);
+}
+
+function getPeonadasDetalleTotal() {
+  return getDetailState().items.reduce((sum, item) => sum + item.total, 0);
+}
+
+function getPeonadasManualTotal() {
+  return parseAmount(document.getElementById("peonadasManual").value);
+}
+
+function getComputedData() {
+  const { baseCompleta, baseAjustada, jornada } = getBaseBreakdown();
+  const base = baseAjustada;
+  const guardias = getGuardiasTotal();
+  const trasplante = getTrasplanteTotal();
+  const peonadasDetalle = getPeonadasDetalleTotal();
+  const peonadasManual = getPeonadasManualTotal();
+  const peonadas = peonadasDetalle + peonadasManual;
+  const bruto = base + guardias + trasplante + peonadas;
+  const irpfPct = parseAmount(document.getElementById("irpf").value);
+  const retencion = bruto * (irpfPct / 100);
+  const neto = bruto - retencion;
+  return { base, baseCompleta, jornada, guardias, trasplante, peonadasDetalle, peonadasManual, peonadas, bruto, irpfPct, retencion, neto };
+}
+
+function recalc() {
+  const { base, guardias, trasplante, peonadasDetalle, peonadasManual, peonadas, bruto, retencion, neto } = getComputedData();
+
+  document.getElementById("subtotalLocDiario").textContent = formatEuro(parseIntSafe(document.getElementById("gLocDiario").value) * GUARDIAS.locDiario);
+  document.getElementById("subtotalPresDiario").textContent = formatEuro(parseIntSafe(document.getElementById("gPresDiario").value) * GUARDIAS.presDiario);
+  document.getElementById("subtotalLocFestivo").textContent = formatEuro(parseIntSafe(document.getElementById("gLocFestivo").value) * GUARDIAS.locFestivo);
+  document.getElementById("subtotalPresFestivo").textContent = formatEuro(parseIntSafe(document.getElementById("gPresFestivo").value) * GUARDIAS.presFestivo);
+  document.getElementById("totalBase").textContent = formatEuro(base);
+  document.getElementById("totalGuardias").textContent = formatEuro(guardias);
+  document.getElementById("totalTrasplante").textContent = formatEuro(trasplante);
+  document.getElementById("totalPeonadasDetalle").textContent = formatEuro(peonadasDetalle);
+  document.getElementById("totalPeonadasManual").textContent = formatEuro(peonadasManual);
+  document.getElementById("totalPeonadas").textContent = formatEuro(peonadas);
+
+  document.getElementById("resBase").textContent = formatEuro(base);
+  document.getElementById("resGuardias").textContent = formatEuro(guardias);
+  document.getElementById("resTrasplante").textContent = formatEuro(trasplante);
+  document.getElementById("resPeonadas").textContent = formatEuro(peonadas);
+  document.getElementById("brutoTotal").textContent = formatEuro(bruto);
+  document.getElementById("retencionTotal").textContent = formatEuro(retencion);
+  document.getElementById("netoTotal").textContent = formatEuro(neto);
+
+  document.getElementById("duplicateWarning").style.display = (peonadasDetalle > 0 && peonadasManual > 0) ? "block" : "none";
+  updateSelectedProcedureInfo();
+  saveState();
+}
+
+function buildSummaryText() {
+  const { base, baseCompleta, jornada, guardias, trasplante, peonadas, bruto, irpfPct, retencion, neto } = getComputedData();
+  return [
+    "Nomina$ Puerta de Hierro",
+    "",
+    `Base completa: ${formatEuro(baseCompleta)}`,
+    `Jornada: ${formatNum(jornada)} %`,
+    `Base + complementos ajustado por jornada: ${formatEuro(base)}`,
+    `Guardias: ${formatEuro(guardias)}`,
+    `Trasplante: ${formatEuro(trasplante)}`,
+    `Peonadas: ${formatEuro(peonadas)}`,
+    `Bruto total: ${formatEuro(bruto)}`,
+    `IRPF: ${formatNum(irpfPct)} %`,
+    `Retención: ${formatEuro(retencion)}`,
+    `Neto estimado: ${formatEuro(neto)}`
+  ].join("
+");
+}
+
+async function copySummary() {
+  const text = buildSummaryText();
+  const notice = document.getElementById("copyNotice");
+  try {
+    await navigator.clipboard.writeText(text);
+    notice.textContent = "Resumen copiado.";
+  } catch (e) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    document.body.removeChild(area);
+    notice.textContent = "Resumen copiado.";
+  }
+  notice.style.display = "block";
+  setTimeout(() => { notice.style.display = "none"; }, 2000);
+}
+
+function resetAll() {
+  localStorage.removeItem(STORAGE_KEY);
+  window._detailState = { items: [] };
+  document.getElementById("salarioBase").value = "1.387,24";
+  document.getElementById("jornada").value = "100";
+  document.getElementById("numTrienios").value = "0";
+  document.getElementById("complementoDestino").value = "729,14";
+  document.getElementById("complementoEspecifico").value = "472,08";
+  document.getElementById("productividadFija").value = "553,00";
+  document.getElementById("productividadVinculacion").value = "488,80";
+  document.getElementById("productividadAMS").value = "396,61";
+  document.getElementById("gLocDiario").value = "";
+  document.getElementById("gPresDiario").value = "";
+  document.getElementById("gLocFestivo").value = "";
+  document.getElementById("gPresFestivo").value = "";
+  document.getElementById("trasplante").value = "";
+  document.getElementById("peonadasManual").value = "";
+  document.getElementById("irpf").value = "";
+  document.getElementById("pCategory").value = "";
+  fillSurgeryOptions();
+  document.getElementById("pQty").value = "1";
+  renderDetailList();
+  recalc();
+}
+
+function saveState() {
+  const state = {
+    salarioBase: document.getElementById("salarioBase").value,
+    jornada: document.getElementById("jornada").value,
+    numTrienios: document.getElementById("numTrienios").value,
+    complementoDestino: document.getElementById("complementoDestino").value,
+    complementoEspecifico: document.getElementById("complementoEspecifico").value,
+    productividadFija: document.getElementById("productividadFija").value,
+    productividadVinculacion: document.getElementById("productividadVinculacion").value,
+    productividadAMS: document.getElementById("productividadAMS").value,
+    gLocDiario: document.getElementById("gLocDiario").value,
+    gPresDiario: document.getElementById("gPresDiario").value,
+    gLocFestivo: document.getElementById("gLocFestivo").value,
+    gPresFestivo: document.getElementById("gPresFestivo").value,
+    trasplante: document.getElementById("trasplante").value,
+    peonadasManual: document.getElementById("peonadasManual").value,
+    irpf: document.getElementById("irpf").value,
+    pCategory: document.getElementById("pCategory").value,
+    pSurgery: document.getElementById("pSurgery").value,
+    pQty: document.getElementById("pQty").value,
+    detailItems: getDetailState().items
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function restoreState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    const set = (id, value) => {
+      if (value !== undefined && value !== null) document.getElementById(id).value = value;
+    };
+    set("salarioBase", state.salarioBase);
+    set("jornada", state.jornada);
+    set("numTrienios", state.numTrienios);
+    set("complementoDestino", state.complementoDestino);
+    set("complementoEspecifico", state.complementoEspecifico);
+    set("productividadFija", state.productividadFija);
+    set("productividadVinculacion", state.productividadVinculacion);
+    set("productividadAMS", state.productividadAMS);
+    set("gLocDiario", state.gLocDiario);
+    set("gPresDiario", state.gPresDiario);
+    set("gLocFestivo", state.gLocFestivo);
+    set("gPresFestivo", state.gPresFestivo);
+    set("trasplante", state.trasplante);
+    set("peonadasManual", state.peonadasManual);
+    set("irpf", state.irpf);
+    set("pCategory", state.pCategory);
+    fillSurgeryOptions();
+    set("pSurgery", state.pSurgery);
+    set("pQty", state.pQty || "1");
+    window._detailState = { items: Array.isArray(state.detailItems) ? state.detailItems : [] };
+    renderDetailList();
+    updateSelectedProcedureInfo();
+  } catch (e) {
+    console.warn("No se pudo restaurar el estado", e);
+  }
+}
+
+function wireInputs() {
+  document.querySelectorAll("#salarioBase,#jornada,#numTrienios,#complementoDestino,#complementoEspecifico,#productividadFija,#productividadVinculacion,#productividadAMS,#gLocDiario,#gPresDiario,#gLocFestivo,#gPresFestivo,#trasplante,#peonadasManual,#irpf,#pQty")
+    .forEach(el => {
+      el.addEventListener("input", recalc);
+      el.addEventListener("change", recalc);
+    });
+  document.getElementById("pCategory").addEventListener("change", () => {
+    fillSurgeryOptions();
+    updateSelectedProcedureInfo();
+    saveState();
+  });
+  document.getElementById("pSurgery").addEventListener("change", () => { updateSelectedProcedureInfo(); saveState(); });
+
+  document.getElementById("btnAddSurgery").addEventListener("click", () => {
+    const cat = document.getElementById("pCategory").value;
+    const surgeryIdx = document.getElementById("pSurgery").value;
+    const qty = Math.max(1, parseIntSafe(document.getElementById("pQty").value || "1"));
+    if (!cat || surgeryIdx === "") return;
+    const item = PEONADAS_DATA[cat][Number(surgeryIdx)];
+    if (!item) return;
+    getDetailState().items.push({
+      category: cat,
+      name: item.name,
+      qty,
+      unit: item.price,
+      total: item.price * qty
+    });
+    renderDetailList();
+    recalc();
+  });
+
+  document.getElementById("btnClearDetail").addEventListener("click", () => {
+    getDetailState().items = [];
+    renderDetailList();
+    recalc();
+  });
+
+  document.getElementById("btnCopy").addEventListener("click", copySummary);
+  document.getElementById("btnReset").addEventListener("click", resetAll);
+}
+
+createTrienioOptions();
+fillCategoryOptions();
+renderDetailList();
+wireInputs();
+restoreState();
+recalc();
+</script>
+</body>
+</html>
