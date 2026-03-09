@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nómina Puerta de Hierro</title>
+<meta name="description" content="Nomina$ Puerta de Hierro: calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas." />
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nomina$">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+
+<meta property="og:title" content="Nomina$ Puerta de Hierro">
+<meta property="og:description" content="Calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dgutim.github.io/nominas/index.html">
+<meta property="og:site_name" content="Nomina$ Puerta de Hierro">
+<meta property="og:image" content="https://dgutim.github.io/nominas/preview.png">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nomina$ Puerta de Hierro">
+<meta name="twitter:description" content="Calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas.">
+<meta name="twitter:image" content="https://dgutim.github.io/nominas/preview.png">
+<style>
+  :root {
+    --bg: #f8fafc; --card: #ffffff; --ink: #0f172a; --muted: #475569; --line: #e2e8f0;
+    --brand: #0f766e; --brand2: #0ea5a4; --soft: #ecfeff; --soft2: #f8fafc; --warn:#7c2d12; --warn-bg:#fff7ed;
+    --ok:#166534; --ok-bg:#f0fdf4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--ink);
+    background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 120px);
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 14px 64px; }
+  .hero {
+    background: linear-gradient(135deg, #0f172a, #134e4a); color:#fff; border-radius:22px; padding:20px;
+    box-shadow:0 20px 45px rgba(15,23,42,.16); margin-bottom:18px;
+  }
+  .hero h1 { margin:0; font-size:30px; letter-spacing:-.03em; }
+  .hero p { margin:8px 0 0; color:rgba(255,255,255,.85); }
+  .top-actions {
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;
+  }
+
+  .account-menu-wrap { position:relative; display:inline-flex; }
+  .account-menu {
+    position:absolute; top:calc(100% + 8px); right:0; min-width:220px; z-index:40;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px;
+    box-shadow:0 18px 40px rgba(15,23,42,.18); display:none;
+  }
+  .account-menu.open { display:block; }
+  .account-menu .menu-item {
+    width:100%; text-align:left; background:#fff; color:var(--ink); border:1px solid transparent;
+    border-radius:12px; padding:11px 12px; font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .account-menu .menu-item:hover { background:#f8fafc; border-color:var(--line); }
+  .account-menu .menu-item + .menu-item { margin-top:6px; }
+  .account-menu .menu-sep { height:1px; background:var(--line); margin:8px 2px; }
+  .hidden-action { display:none !important; }
+
+  .card, .totals {
+    background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px;
+    box-shadow:0 8px 24px rgba(15,23,42,.05); margin-bottom:16px;
+  }
+  .card h2 { margin:0 0 6px; font-size:20px; letter-spacing:-.02em; }
+  .card h3 { margin:0 0 12px; font-size:17px; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom:14px; }
+  .grid { display:grid; gap:12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-3 { display:grid; gap:12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  label { font-size:14px; font-weight:600; }
+  input, select, button {
+    width:100%; border:1px solid #cbd5e1; border-radius:14px; padding:12px 13px; font-size:16px;
+    background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus, button:focus {
+    outline:3px solid rgba(14,165,164,.18); border-color:var(--brand2);
+  }
+  .money { font-variant-numeric: tabular-nums; font-weight:700; font-size:19px; }
+  .inline-total {
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:12px 14px; background:#f8fafc; border:1px solid var(--line); border-radius:16px; margin-top:14px;
+  }
+  .muted { color:var(--muted); font-size:13px; }
+  .summary-row {
+    display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .summary-row:last-child { border-bottom:none; }
+  .summary-row strong { font-size:17px; }
+  .grand { margin-top:12px; padding-top:14px; border-top:2px solid var(--ink); }
+  .warn {
+    margin-top:12px; background:var(--warn-bg); border:1px solid #fed7aa; border-radius:14px;
+    padding:12px 14px; color:var(--warn); font-size:14px;
+  }
+  .ok {
+    margin-top:12px; background:var(--ok-bg); border:1px solid #bbf7d0; border-radius:14px;
+    padding:12px 14px; color:var(--ok); font-size:14px; display:none;
+  }
+  .detail-block {
+    border:1px solid var(--line); border-radius:18px; padding:16px; background:#fcfcfd; margin-top:10px;
+  }
+  .pill {
+    display:inline-flex; align-items:center; gap:8px; background:var(--soft); color:#155e75; border:1px solid #bae6fd;
+    border-radius:999px; padding:8px 12px; font-size:13px; font-weight:600;
+  }
+  .surgery-list { margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; }
+  .surgery-item {
+    display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px dashed #e5e7eb;
+  }
+  .surgery-item:last-child { border-bottom:none; }
+  .btn { background:var(--ink); color:#fff; border:none; font-weight:700; cursor:pointer; }
+  .btn.secondary { background:#fff; color:var(--ink); border:1px solid #cbd5e1; }
+  .btn.small { width:auto; padding:10px 12px; font-size:14px; }
+  .right { text-align:right; }
+
+  .soft-note {
+    margin-top:10px; font-size:13px; color:var(--muted);
+  }
+  .subtotal-line { margin-top:6px; font-size:13px; color:var(--muted); font-weight:600; }
+  .danger {
+    margin-top:12px; background:#fef2f2; border:1px solid #fecaca; border-radius:14px;
+    padding:12px 14px; color:#991b1b; font-size:14px; display:none;
+  }
+  .totals {
+    border:2px solid #c7d2fe;
+    box-shadow:0 12px 28px rgba(15,23,42,.08);
+  }
+  .totals .grand strong, .totals .grand span strong { font-size:20px; }
+  .totals .summary-row:last-child strong { font-size:20px; }
+
+  .auth-bar {
+    margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:14px 16px;
+  }
+  .auth-status {
+    font-size:15px; color:rgba(255,255,255,.96); font-weight:600;
+  }
+  .auth-status strong { color:#fff; }
+  .auth-state-pill{
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:8px;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18);
+    color:#fff; border-radius:999px; padding:7px 11px; font-size:13px; font-weight:700;
+  }
+  .auth-box { display:none; }
+  .auth-box.open { display:block; }
+  .auth-panels { display:grid; gap:14px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top:14px; }
+  .auth-panel { border:1px solid var(--line); border-radius:18px; padding:16px; background:#fbfdff; }
+  .auth-panel h3 { margin:0 0 10px; }
+  .auth-grid { display:grid; gap:12px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top:14px; }
+  .auth-grid.single { grid-template-columns:1fr; margin-top:0; }
+  .auth-divider { margin:10px 0 0; font-size:13px; color:var(--muted); }
+  .auth-help { margin-top:10px; font-size:13px; color:var(--muted); }
+  .auth-note { margin-top:10px; background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:12px 14px; font-size:13px; color:var(--muted); }
+  .history-card { display:none; scroll-margin-top:18px; }
+  .history-card.open { display:block; }
+  .history-table-wrap { overflow:auto; margin-top:10px; }
+  table.history-table { width:100%; border-collapse:collapse; min-width:700px; }
+  .history-table th, .history-table td { border-bottom:1px solid var(--line); padding:10px 8px; text-align:left; font-size:14px; }
+  .history-table th { color:var(--muted); font-weight:700; background:#f8fafc; }
+  .history-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .period-field { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:10px 12px; }
+  .period-field input { -webkit-appearance:none; appearance:none; min-height:48px; border-radius:16px; background:#fff; border:1px solid #cbd5e1; padding:12px 13px; font-weight:600; }
+  .hero-actions-primary { display:flex; gap:10px; flex-wrap:wrap; }
+  .ghost-note { color:rgba(255,255,255,.78); font-size:13px; margin-top:10px; }
+  .history-summary { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:12px; }
+  .history-metric { border:1px solid var(--line); border-radius:16px; padding:12px 14px; background:#fbfdff; }
+  .history-metric .muted { display:block; margin-bottom:6px; }
+  .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.55); display:none; align-items:center; justify-content:center; padding:18px; z-index:999; }
+  .modal-backdrop.open { display:flex; }
+  .modal-card { width:min(680px, 100%); max-height:min(82vh, 760px); overflow:auto; -webkit-overflow-scrolling:touch; background:#fff; border-radius:22px; padding:20px; box-shadow:0 24px 70px rgba(15,23,42,.35); }
+  .instruction-list { margin:12px 0 0; padding-left:18px; color:var(--muted); }
+  .instruction-list li { margin:8px 0; }
+
+
+  .history-toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:14px; }
+  .history-toolbar-actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .history-export-note { font-size:13px; color:var(--muted); }
+  .history-chart-card { margin-top:16px; border:1px solid var(--line); border-radius:18px; padding:16px; background:#fcfcfd; }
+  .history-chart-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+  .history-chart-note { font-size:13px; color:var(--muted); }
+  .history-chart-wrap { display:flex; align-items:flex-end; gap:14px; min-height:290px; overflow-x:auto; padding:16px 10px 8px; border:1px dashed var(--line); border-radius:16px; background:#fff; }
+  .history-chart-empty { color:var(--muted); font-size:14px; padding:20px 8px; }
+  .chart-col { min-width:78px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .chart-value-wrap { min-height:48px; display:flex; align-items:flex-end; justify-content:center; width:100%; margin-bottom:10px; padding:0 2px; }
+  .chart-value { font-size:12px; font-weight:700; color:var(--ink); text-align:center; line-height:1.15; }
+  .chart-bar-shell { width:46px; height:220px; display:flex; align-items:flex-end; margin-top:2px; }
+  .chart-bar { width:100%; display:flex; flex-direction:column-reverse; align-items:stretch; border-radius:14px 14px 8px 8px; overflow:hidden; background:#e2e8f0; box-shadow:inset 0 0 0 1px rgba(15,23,42,.05); }
+  .chart-segment { width:100%; min-height:2px; }
+  .chart-label { font-size:12px; color:var(--muted); text-align:center; line-height:1.25; }
+  .chart-legend { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+  .chart-legend-item { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+  .chart-dot { width:10px; height:10px; border-radius:999px; display:inline-block; }
+  .seg-base { background:#0f766e; }
+  .seg-guardias { background:#0ea5a4; }
+  .seg-trasplante { background:#38bdf8; }
+  .seg-peonadas { background:#a78bfa; }
+  .seg-incidencias { background:#ef4444; }
+  .seg-otros { background:#f59e0b; }
+
+  .theme-toggle-active { box-shadow: inset 0 0 0 2px rgba(15,23,42,.12); }
+  body.dark-mode {
+    --bg: #020617; --card: #0f172a; --ink: #e2e8f0; --muted: #94a3b8; --line: #334155;
+    --brand: #14b8a6; --brand2: #2dd4bf; --soft: #0f172a; --soft2: #020617; --warn:#fdba74; --warn-bg:#431407;
+    --ok:#86efac; --ok-bg:#052e16;
+    background: linear-gradient(180deg, #0b1220 0%, var(--bg) 120px);
+  }
+  body.dark-mode input,
+  body.dark-mode select,
+  body.dark-mode button { background:#0b1220; color:var(--ink); border-color:#475569; }
+  body.dark-mode .btn { background:#e2e8f0; color:#0f172a; }
+  body.dark-mode .btn.secondary { background:#0b1220; color:var(--ink); border-color:#475569; }
+  body.dark-mode .inline-total,
+  body.dark-mode .detail-block,
+  body.dark-mode .history-chart-card,
+  body.dark-mode .history-metric,
+  body.dark-mode .history-table th { background:#0b1220; }
+  body.dark-mode .history-table th,
+  body.dark-mode .history-table td { border-color:#334155; }
+  body.dark-mode .modal-card { background:#0f172a; color:var(--ink); border-color:#334155; }
+  body.dark-mode footer { border-top-color:#334155 !important; color:#94a3b8 !important; }
+  body.dark-mode a { color:#67e8f9; }
+
+  @media (max-width: 760px) {
+    .grid, .grid-3, .auth-panels, .auth-grid { grid-template-columns:1fr; }
+    .hero h1 { font-size:28px; }
+    .inline-total { flex-direction:column; align-items:flex-start; }
+    .history-summary { grid-template-columns:1fr; }
+    .history-chart-wrap { min-height:250px; }
+    .chart-col { min-width:64px; }
+    .chart-bar-shell { width:40px; height:190px; }
+    .incidence-summary-grid { grid-template-columns:1fr; }
+    .account-menu-wrap { position:relative; }
+    .account-menu {
+      position:absolute;
+      top:calc(100% + 8px);
+      left:0;
+      right:auto;
+      min-width:min(260px, calc(100vw - 48px));
+      max-width:calc(100vw - 48px);
+      transform:none;
+      z-index:1200;
+    }
+    .modal-backdrop { align-items:flex-start; padding:14px; overflow:auto; }
+    .modal-card { margin:14px auto; width:100%; max-height:none; }
+    .instruction-list { font-size:14px; }
+    .instruction-list li { margin:10px 0; }
+  }
+
+  .month-type-card .grid-3 { align-items:end; }
+  .special-mode-card { display:none; }
+  .special-mode-card.open { display:block; }
+  .inactive-card { opacity:.55; pointer-events:none; filter:grayscale(.08); }
+  .mode-badge {
+    display:inline-flex; align-items:center; gap:8px; background:#f8fafc; border:1px solid var(--line);
+    border-radius:999px; padding:8px 12px; font-size:13px; font-weight:700; color:var(--ink);
+  }
+  .special-note { margin-top:10px; font-size:13px; color:var(--muted); }
+  textarea {
+    width:100%; border:1px solid #cbd5e1; border-radius:14px; padding:12px 13px; font-size:16px;
+    background:#fff; color:var(--ink); min-height:96px; resize:vertical;
+  }
+  textarea:focus { outline:3px solid rgba(14,165,164,.18); border-color:var(--brand2); }
+
+
+  .period-indicator {
+    display: none !important;
+    margin-top: 12px;
+    align-items: center;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .period-warning {
+    margin-top: 10px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #9a3412;
+    font-size: 14px;
+    display: none;
+  }
+  .type-pill {
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#f8fafc;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+
+
+.auth-user-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#f1f5f9;
+  border:1px solid #e2e8f0;
+  font-size:13px;
+  font-weight:600;
+  color:#0f172a;
+}
+.auth-user-badge span{
+  font-weight:700;
+}
+
+
+  .incidence-summary-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:14px; }
+  .incidence-summary-metric { border:1px solid var(--line); border-radius:16px; padding:12px 14px; background:#fbfdff; }
+  .incidence-summary-metric .muted { display:block; margin-bottom:6px; }
+  .incidence-item-card { border:1px solid var(--line); border-radius:16px; padding:14px; background:#fff; margin-top:10px; }
+  .incidence-meta { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .incidence-type-badge { display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; background:#fef2f2; color:#991b1b; border:1px solid #fecaca; font-size:12px; font-weight:700; }
+  .year-peonadas-block { margin-top:16px; border:1px solid var(--line); border-radius:18px; padding:16px; background:#fcfcfd; }
+  .year-peonadas-table { width:100%; border-collapse:collapse; margin-top:10px; }
+  .year-peonadas-table th, .year-peonadas-table td { padding:10px 8px; text-align:left; border-bottom:1px solid var(--line); font-size:14px; }
+  .year-peonadas-table th { color:var(--muted); background:#f8fafc; }
+  body.dark-mode .incidence-summary-metric,
+  body.dark-mode .incidence-item-card,
+  body.dark-mode .year-peonadas-block,
+  body.dark-mode .year-peonadas-table th { background:#0b1220; }
+  body.dark-mode .year-peonadas-table th,
+  body.dark-mode .year-peonadas-table td { border-color:#334155; }
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Nomina$ Puerta de Hierro</h1>
+      <p>Calculadora de nómina hospitalaria con sueldo base, guardias, trasplante y peonadas.</p>
+      <div class="top-actions hero-actions-primary">
+        <button type="button" class="btn small secondary" id="btnReset">Reiniciar cálculo</button>
+        <button type="button" class="btn small" id="btnCopy">Copiar resumen</button>
+        <button type="button" class="btn small" id="btnSaveHistory" style="display:none;">Añadir a historial</button>
+        <button type="button" class="btn small secondary" id="btnToggleHistory" style="display:none;">Historial</button>
+
+        <div class="account-menu-wrap">
+          <button type="button" class="btn small secondary" id="btnAccountMenu">Cuenta ▾</button>
+          <div class="account-menu" id="accountMenu" aria-hidden="true">
+            <button type="button" class="menu-item" id="btnMenuAccount">Mi cuenta</button>
+            <div class="menu-sep"></div>
+            <button type="button" class="menu-item" id="btnMenuLogout" style="display:none;">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn small secondary hidden-action" id="btnToggleAuth">Iniciar sesión</button>
+        <button type="button" class="btn small secondary" id="btnInstructions">Instrucciones</button>
+        <button type="button" class="btn small secondary" id="btnToggleTheme" title="Modo oscuro">Modo oscuro</button>
+        <button type="button" class="btn small secondary hidden-action" id="btnLogout" style="display:none;">Cerrar sesión</button>
+      </div>
+      <div class="auth-bar">
+        <div>
+          <div class="auth-state-pill">Estado de sesión</div><div class="auth-status" id="authStatus">No has iniciado sesión todavía.</div>
+          <div class="ghost-note">Accede para guardar la nómina actual y consultarla más adelante en tu historial.</div>
+        </div>
+        <div class="field period-field" style="max-width:220px; min-width:180px; margin:0;">
+          <label for="periodoNomina" style="color:#fff;">Periodo</label>
+          <input id="periodoNomina" type="month" />
+        </div>
+      </div>
+            <div id="periodOverwriteWarning" class="period-warning">Ya existe una nómina guardada para este periodo. Si guardas, se actualizará.</div>
+      <div id="copyNotice" class="ok">Resumen copiado.</div>
+      <div id="saveNotice" class="ok">Nómina guardada en tu historial.</div>
+      <div id="authError" class="danger"></div>
+    </section>
+
+    <section class="card history-card" id="historyCard">
+      <h2>Historial</h2>
+      <div class="sub">Tus nóminas guardadas por mes. Puedes cargar una guardada para revisar o seguir editando.</div>
+      <div class="history-toolbar">
+        <div class="history-export-note">Puedes descargar tu historial con la tabla y la comparativa visual.</div>
+        <div class="history-toolbar-actions">
+          <button type="button" class="btn small secondary" id="btnDownloadCsv" style="display:none;">Descargar CSV</button>
+          <button type="button" class="btn small" id="btnDownloadPdf" style="display:none;">Descargar PDF</button>
+        </div>
+      </div>
+      <div class="history-summary">
+        <div class="history-metric"><span class="muted">Meses guardados</span><strong id="historyMetricCount">0</strong></div>
+        <div class="history-metric"><span class="muted">Último neto</span><strong id="historyMetricLastNet">0,00 €</strong></div>
+        <div class="history-metric"><span class="muted">Promedio neto</span><strong id="historyMetricAvgNet">0,00 €</strong></div>
+      </div>
+      <div class="history-chart-card">
+        <div class="history-chart-head">
+          <div>
+            <h3 style="margin:0 0 6px;">Comparativa visual por mes</h3>
+            <div class="history-chart-note">Cada barra representa el <strong>neto estimado</strong> del mes. Los colores reparten esa barra por conceptos de forma proporcional: <strong>Base + complementos</strong>, guardias, trasplante, peonadas y otros conceptos.</div>
+          </div>
+        </div>
+        <div class="history-chart-wrap" id="historyChartWrap">
+          <div class="history-chart-empty">Inicia sesión para ver la comparativa mensual.</div>
+        </div>
+        <div class="chart-legend">
+          <span class="chart-legend-item"><span class="chart-dot seg-base"></span>Base + complementos</span>
+          <span class="chart-legend-item"><span class="chart-dot seg-guardias"></span>Guardias</span>
+          <span class="chart-legend-item"><span class="chart-dot seg-trasplante"></span>Trasplante</span>
+          <span class="chart-legend-item"><span class="chart-dot seg-peonadas"></span>Peonadas</span>
+          <span class="chart-legend-item"><span class="chart-dot seg-incidencias"></span>Incidencias</span>
+          <span class="chart-legend-item"><span class="chart-dot seg-otros"></span>Otros conceptos</span>
+        </div>
+      </div>
+      <div id="historyPeonadasByYear"></div>
+      <div class="history-table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Periodo</th>
+              <th>Tipo</th>
+              <th>Bruto</th>
+              <th>Guardias</th>
+              <th>Peonadas</th>
+              <th>Incidencias</th>
+              <th>Otros</th>
+              <th>Neto</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="9" class="muted">Inicia sesión para ver tu historial.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card auth-box" id="authBox">
+      <h2>Acceso</h2>
+      <div class="sub">Inicia sesión con email y contraseña. El alias solo se pide al crear una cuenta nueva.</div>
+      <div class="auth-panels">
+        <div class="auth-panel">
+          <h3>Entrar</h3>
+          <div class="auth-grid single">
+            <div class="field">
+              <label for="loginEmail">Email</label>
+              <input id="loginEmail" type="email" autocomplete="email" placeholder="tu@email.com" />
+            </div>
+            <div class="field">
+              <label for="loginPassword">Contraseña</label>
+              <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña" />
+            </div>
+          </div>
+          <div class="top-actions" style="margin-top:14px;">
+            <button type="button" class="btn small secondary" id="btnLoginEmail">Entrar con email</button>
+          </div>
+          <div class="auth-help">Usa tu email y contraseña para entrar. El alias solo se utiliza al crear la cuenta y para mostrar tu perfil dentro de la web.</div>
+        </div>
+        <div class="auth-panel">
+          <h3>Crear cuenta</h3>
+          <div class="auth-grid single">
+            <div class="field">
+              <label for="registerAlias">Alias</label>
+              <input id="registerAlias" type="text" maxlength="40" placeholder="Ej. TraumaMadrid" />
+            </div>
+            <div class="field">
+              <label for="registerEmail">Email</label>
+              <input id="registerEmail" type="email" autocomplete="email" placeholder="tu@email.com" />
+            </div>
+            <div class="field">
+              <label for="registerPassword">Contraseña</label>
+              <input id="registerPassword" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" />
+            </div>
+          </div>
+          <label style="display:flex; gap:8px; align-items:flex-start; margin-top:14px; font-size:13px; color:var(--muted);">
+            <input type="checkbox" id="acceptPrivacy" style="width:auto; margin-top:2px;" />
+            <span>He leído y acepto la <a href="#" id="openPrivacyInline">política de privacidad</a>.</span>
+          </label>
+          <div class="top-actions" style="margin-top:14px;">
+            <button type="button" class="btn small" id="btnRegisterEmail">Crear cuenta</button>
+          </div>
+          <div class="auth-note">Al iniciar sesión, podrás añadir la nómina actual a tu historial y recuperarla cuando quieras.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="modal-backdrop" id="instructionsModal" aria-hidden="true">
+      <div class="modal-card">
+        <h2>Cómo usar la web</h2>
+        <div class="sub">Guía rápida para calcular, guardar y comparar tus nóminas.</div>
+        <ol class="instruction-list">
+          <li><strong>Crear una cuenta.</strong> Para poder guardar tus nóminas y hacer seguimiento de tu actividad, primero crea una cuenta e inicia sesión. Si no inicias sesión podrás usar la calculadora, pero no se guardará el historial.</li>
+          <li><strong>Introducir los datos de la nómina.</strong> Completa los campos correspondientes a tu nómina: salario base y cualquier otro dato inicial necesario para el cálculo.</li>
+          <li><strong>Añadir actividad y complementos.</strong> Añade las peonadas, guardias y otros conceptos que correspondan a tu actividad. En el caso de las peonadas, selecciona la especialidad y el procedimiento realizado; el sistema añadirá automáticamente el importe correspondiente según la tabla de precios.</li>
+          <li><strong>Seleccionar el periodo.</strong> Indica arriba a la derecha el mes de la nómina para poder identificarla correctamente y evitar confusiones al guardarla.</li>
+          <li><strong>Revisar el cálculo.</strong> A medida que introduces los datos, la aplicación calcula automáticamente el total estimado de la nómina.</li>
+          <li><strong>Guardar en el historial.</strong> Cuando hayas terminado de introducir todos los datos, pulsa <strong>Añadir a historial</strong> para guardar esa nómina en tu cuenta.</li>
+          <li><strong>Analizar y comparar.</strong> Después de guardar la nómina, entra en <strong>Historial</strong> para revisar su evolución, analizar tus meses previos y compararla con otras nóminas guardadas anteriormente.</li>
+        </ol>
+        <div class="top-actions" style="margin-top:18px;">
+          <button type="button" class="btn small secondary" id="btnCloseInstructions">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="privacyModal" aria-hidden="true">
+      <div class="modal-card">
+        <h2>Política de privacidad</h2>
+        <div class="sub">Información básica sobre cómo se usan tus datos dentro de la aplicación.</div>
+        <div class="instruction-list" style="padding-left:0; list-style:none;">
+          <p><strong>Responsable</strong><br>Diego Gutiérrez Martínez</p>
+          <p><strong>Contacto</strong><br><a href="mailto:diegogutimartinez@gmail.com">diegogutimartinez@gmail.com</a></p>
+          <p><strong>Datos tratados</strong><br>Email, alias y datos introducidos por el usuario para calcular y guardar sus nóminas.</p>
+          <p><strong>Finalidad</strong><br>Permitir el acceso a la aplicación, guardar el historial de nóminas y ofrecer comparativas mensuales.</p>
+          <p><strong>Proveedor técnico</strong><br>Los datos se almacenan en Firebase, servicio prestado por Google.</p>
+          <p><strong>Conservación</strong><br>Los datos se mantienen mientras el usuario utilice la aplicación o hasta que solicite su eliminación.</p>
+          <p><strong>Derechos</strong><br>Puedes solicitar información o eliminación de tus datos escribiendo al correo de contacto.</p>
+          <p><strong>Aviso</strong><br>Los cálculos son orientativos y no sustituyen la nómina oficial.</p>
+        </div>
+        <div class="top-actions" style="margin-top:18px;">
+          <button type="button" class="btn small secondary" id="btnClosePrivacy">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+
+    
+
+
+<section class="card standard-mode-card" id="salaryCard">
+
+      <h2>Sueldo Base + complementos</h2>
+      <div class="sub">Sueldo base, complementos y productividades precargados y editables.</div>
+      <div class="grid">
+        <div class="field">
+          <label for="salarioBase">Sueldo base (€)</label>
+          <input id="salarioBase" type="text" inputmode="decimal" value="1.387,24" />
+        </div>
+        <div class="field">
+          <label for="jornada">Jornada (%)</label>
+          <input id="jornada" type="text" inputmode="decimal" value="100" placeholder="100" />
+          <div class="muted">100% = jornada completa</div>
+        </div>
+        <div class="field">
+          <label for="numTrienios">Trienios</label>
+          <select id="numTrienios"></select>
+        </div>
+        <div class="field">
+          <label for="carrera">Carrera profesional</label>
+          <select id="carrera">
+            <option value="0">Nivel 0</option>
+            <option value="270.53">Nivel I</option>
+            <option value="512.06">Nivel II</option>
+            <option value="772.88">Nivel III</option>
+            <option value="1014.41">Nivel IV</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="complementoDestino">Complemento destino (€)</label>
+          <input id="complementoDestino" type="text" inputmode="decimal" value="729,14" />
+        </div>
+        <div class="field">
+          <label for="complementoEspecifico">Complemento específico (€)</label>
+          <input id="complementoEspecifico" type="text" inputmode="decimal" value="472,08" />
+        </div>
+        <div class="field">
+          <label for="productividadFija">Productividad fija (€)</label>
+          <input id="productividadFija" type="text" inputmode="decimal" value="553,00" />
+        </div>
+        <div class="field">
+          <label for="productividadVinculacion">Productividad por vinculación (€)</label>
+          <input id="productividadVinculacion" type="text" inputmode="decimal" value="488,80" />
+        </div>
+        <div class="field">
+          <label for="productividadAMS">Productividad fija AMS (€)</label>
+          <input id="productividadAMS" type="text" inputmode="decimal" value="396,61" />
+        </div>
+      </div>
+      <div class="inline-total">
+        <div>
+          <div class="muted">Trienios calculados automáticamente</div>
+          <div id="detalleTrienios" class="money">0,00 €</div>
+          <div class="soft-note">Base completa antes de jornada: <strong id="baseCompletaInfo">0,00 €</strong></div>
+        </div>
+        <div class="right">
+          <div class="muted">Bruto Sueldo Base + complementos ajustado por jornada</div>
+          <div id="totalBase" class="money">0,00 €</div>
+        </div>
+      </div>
+    </section>
+
+<section class="card incidences-card" id="incidencesCard">
+  <h2>Incidencias del mes</h2>
+  <div class="sub">Añade aquí bajas, permisos, vacaciones u otras situaciones que afecten a una parte o a todo el periodo. La calculadora sigue activa para guardias, peonadas y otros conceptos. La <strong>base + complementos</strong> se prorratea automáticamente por los días sin incidencia.</div>
+  <div class="detail-block">
+    <h3>Añadir incidencia</h3>
+    <div class="grid-3">
+      <div class="field">
+        <label for="incidenceType">Tipo de incidencia</label>
+        <select id="incidenceType">
+          <option value="">Selecciona</option>
+          <option value="Baja paternal / maternal">Baja paternal / maternal</option>
+          <option value="Baja médica / IT">Baja médica / IT</option>
+          <option value="Vacaciones">Vacaciones</option>
+          <option value="Permiso">Permiso</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="incidenceStart">Desde</label>
+        <input id="incidenceStart" type="date" />
+      </div>
+      <div class="field">
+        <label for="incidenceEnd">Hasta</label>
+        <input id="incidenceEnd" type="date" />
+      </div>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label for="incidenceAmount">Remuneración de la incidencia (€)</label>
+        <input id="incidenceAmount" type="text" inputmode="decimal" placeholder="0,00" />
+        <div class="muted">Introduce aquí lo que hayas cobrado o esperes cobrar por ese tramo de incidencia.</div>
+      </div>
+      <div class="field">
+        <label for="incidenceNotes">Notas (opcional)</label>
+        <input id="incidenceNotes" type="text" maxlength="120" placeholder="Ej. INSS 1ª quincena" />
+      </div>
+    </div>
+    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button type="button" class="btn small" id="btnAddIncidence">Añadir incidencia</button>
+      <button type="button" class="btn small secondary" id="btnClearIncidences">Vaciar incidencias</button>
+    </div>
+    <div id="incidencesError" class="danger" style="display:none;"></div>
+    <div id="incidencesList" class="surgery-list"></div>
+    <div class="incidence-summary-grid">
+      <div class="incidence-summary-metric"><span class="muted">Días del periodo</span><strong id="incidenceDaysTotal">0</strong></div>
+      <div class="incidence-summary-metric"><span class="muted">Días con incidencia</span><strong id="incidenceDaysAffected">0</strong></div>
+      <div class="incidence-summary-metric"><span class="muted">Base + complementos tras prorrateo</span><strong id="proratedBaseInfo">0,00 €</strong></div>
+    </div>
+    <div class="inline-total">
+      <div class="muted">Total remuneración de incidencias</div>
+      <div id="totalIncidences" class="money">0,00 €</div>
+    </div>
+  </div>
+</section>
+
+    <section class="card standard-mode-card" id="guardiasCard">
+      <h2>Guardias</h2>
+      <div class="sub">Escribe cuántas has hecho de cada tipo. El precio queda oculto dentro del cálculo.</div>
+      <div class="grid">
+        <div class="field">
+          <label for="gLocDiario">Localizada diario</label>
+          <input id="gLocDiario" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal localizada diario: <span id="subtotalLocDiario">0,00 €</span></div>
+        </div>
+        <div class="field">
+          <label for="gPresDiario">Presencia diario</label>
+          <input id="gPresDiario" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal presencia diario: <span id="subtotalPresDiario">0,00 €</span></div>
+        </div>
+        <div class="field">
+          <label for="gLocFestivo">Localizada festivo</label>
+          <input id="gLocFestivo" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal localizada festivo: <span id="subtotalLocFestivo">0,00 €</span></div>
+        </div>
+        <div class="field">
+          <label for="gPresFestivo">Presencia festivo</label>
+          <input id="gPresFestivo" type="number" min="0" step="1" placeholder="0" />
+          <div class="subtotal-line">Subtotal presencia festivo: <span id="subtotalPresFestivo">0,00 €</span></div>
+        </div>
+      </div>
+      <div class="inline-total">
+        <div class="muted">Bruto Guardias</div>
+        <div id="totalGuardias" class="money">0,00 €</div>
+      </div>
+    </section>
+
+    <section class="card standard-mode-card" id="trasplanteCard">
+      <h2>Trimestral trasplante</h2>
+      <div class="sub">Rellénalo solo cuando corresponda.</div>
+      <div class="field">
+        <label for="trasplante">Importe trimestral trasplante (€)</label>
+        <input id="trasplante" type="text" inputmode="decimal" placeholder="0,00" />
+      </div>
+      <div class="inline-total">
+        <div class="muted">Bruto Trimestral trasplante</div>
+        <div id="totalTrasplante" class="money">0,00 €</div>
+      </div>
+    </section>
+
+    <section class="card standard-mode-card" id="peonadasCard">
+      <h2>Peonadas</h2>
+      <div class="sub">Puedes reconstruir procedimientos del mes y, además, meter aparte un total manual del mes si ya lo tienes calculado.</div>
+
+      <div class="detail-block">
+        <h3>Peonadas por detalle</h3>
+        <div class="sub">Añade aquí los procedimientos que recuerdes. Puedes mezclar distintas especialidades.</div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="pCategory">Especialidad / tipo de peonada</label>
+            <select id="pCategory" onchange="window.handlePeonadaCategoryChange && window.handlePeonadaCategoryChange()" oninput="window.handlePeonadaCategoryChange && window.handlePeonadaCategoryChange()">
+              <option value="">Selecciona</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pSurgery">Cirugía / procedimiento</label>
+            <select id="pSurgery">
+              <option value="">Selecciona</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pQty">Cantidad</label>
+            <input id="pQty" type="number" min="1" step="1" value="1" />
+          </div>
+        </div>
+        <div id="pSelectedPrice" class="soft-note">Selecciona una cirugía para ver su importe antes de añadirla.</div>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn small" id="btnAddSurgery" onclick="window.addSelectedSurgeryToDetail && window.addSelectedSurgeryToDetail(); return false;">Añadir procedimiento</button>
+          <button type="button" class="btn small secondary" id="btnClearDetail">Vaciar detalle</button>
+        </div>
+        <div id="detailList" class="surgery-list"></div>
+        <div class="inline-total">
+          <div class="muted">Subtotal peonadas por detalle</div>
+          <div id="totalPeonadasDetalle" class="money">0,00 €</div>
+        </div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Peonadas por importe manual</h3>
+        <div class="sub">Si ya tienes calculado el total del mes, escríbelo aquí sin desglosar.</div>
+        <div class="field">
+          <label for="peonadasManual">Importe total manual de peonadas (€)</label>
+          <input id="peonadasManual" type="text" inputmode="decimal" placeholder="0,00" />
+        </div>
+        <div class="inline-total">
+          <div class="muted">Subtotal peonadas manuales</div>
+          <div id="totalPeonadasManual" class="money">0,00 €</div>
+        </div>
+      </div>
+
+      <div class="inline-total">
+        <div>
+          <div class="muted">Bruto Peonadas</div>
+          <div class="pill">Detalle + manual</div>
+        </div>
+        <div id="totalPeonadas" class="money">0,00 €</div>
+      </div>
+    </section>
+
+
+    <section class="card standard-mode-card" id="extrasCard">
+      <h2>Otros conceptos manuales</h2>
+      <div class="sub">Importes manuales no vinculados al ajuste de jornada. Úsalo para paga extra, atrasos, complemento de vacaciones u otros abonos puntuales.</div>
+
+      <div class="detail-block">
+        <h3>Añadir concepto</h3>
+        <div class="grid-3">
+          <div class="field">
+            <label for="extraType">Tipo de concepto</label>
+            <select id="extraType">
+              <option value="">Selecciona</option>
+              <option value="Paga extra">Paga extra</option>
+              <option value="Atrasos">Atrasos</option>
+              <option value="Complemento vacaciones">Complemento vacaciones</option>
+              <option value="Productividad extraordinaria">Productividad extraordinaria</option>
+              <option value="Regularización">Regularización</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="field" id="extraCustomWrap" style="display:none;">
+            <label for="extraCustomName">Descripción personalizada</label>
+            <input id="extraCustomName" type="text" maxlength="80" placeholder="Ej. Abono puntual" />
+          </div>
+          <div class="field">
+            <label for="extraAmount">Importe (€)</label>
+            <input id="extraAmount" type="text" inputmode="decimal" placeholder="0,00" />
+          </div>
+        </div>
+        <div class="soft-note">Estos importes se suman al bruto total tal cual, sin ajuste por jornada.</div>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn small" id="btnAddExtra">Añadir concepto</button>
+          <button type="button" class="btn small secondary" id="btnClearExtras">Vaciar otros conceptos</button>
+        </div>
+        <div id="extrasError" class="danger" style="display:none;"></div>
+        <div id="extrasList" class="surgery-list"></div>
+        <div class="inline-total">
+          <div class="muted">Bruto Otros conceptos</div>
+          <div id="totalExtras" class="money">0,00 €</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card standard-mode-card" id="retencionCard">
+      <h2>Retención</h2>
+      <div class="sub">Introduce el porcentaje de IRPF que quieras aplicar al final sobre el bruto total.</div>
+      <div class="grid">
+        <div class="field">
+          <label for="irpf">IRPF (%)</label>
+          <input id="irpf" type="text" inputmode="decimal" placeholder="31,31" />
+        </div>
+      </div>
+      <div class="warn">El neto es una estimación práctica aplicando la retención al bruto total.</div>
+      <div id="duplicateWarning" class="danger">Atención: estás usando peonadas por detalle y también peonadas manuales. Revisa que no estés duplicando importes.</div>
+    </section>
+
+    <section class="totals">
+      <div class="summary-row"><span>Bruto Sueldo Base + complementos ajustado por jornada</span><strong id="resBase">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Guardias</span><strong id="resGuardias">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Trimestral trasplante</span><strong id="resTrasplante">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Peonadas</span><strong id="resPeonadas">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Incidencias</span><strong id="resIncidencias">0,00 €</strong></div>
+      <div class="summary-row"><span>Bruto Otros conceptos</span><strong id="resExtras">0,00 €</strong></div>
+      <div class="summary-row grand"><span><strong>Bruto total</strong></span><strong id="brutoTotal">0,00 €</strong></div>
+      <div class="summary-row"><span>Retención IRPF</span><strong id="retencionTotal">0,00 €</strong></div>
+      <div class="summary-row"><span><strong>Neto estimado</strong></span><strong id="netoTotal">0,00 €</strong></div>
+    </section>
+  </div>
+
+<script>
+const PEONADAS_DATA = {"CGD (CIRUGÍA GENERAL)": [{"name": "Colecistectomía", "price": 152.8}, {"name": "Hernia inguinal/umbilical UNILATERAL", "price": 60.9}, {"name": "Hernia inguinal UNILATERAL/umbilical LAPAROSCÓPICA", "price": 122.0}, {"name": "Hernia inguinal BILATERAL", "price": 117.9}, {"name": "Hernia inguinal BILATERAL LAPAROSCÓPICA", "price": 236.0}, {"name": "Eventroplastia (abierta o laparoscópica)", "price": 230.0}, {"name": "Hemicolectomía/Sigmoidectomía", "price": 318.0}, {"name": "TAMIS (cirugía transanal mínimamente invasiva)", "price": 318.0}, {"name": "Cierre de ileostomía", "price": 152.8}, {"name": "Cirugía proctológica (hemorroide, fístula, absceso anal)", "price": 106.5}, {"name": "Tiroidectomía total", "price": 320.0}, {"name": "Hemitiroidectomía", "price": 185.0}, {"name": "Cirugía partes blandas (Lipoma)", "price": 120.0}], "COT (TRAUMATOLOGÍA Y CIRUGÍA ORTOPÉDICA) 2 QUIRÓFANOS": [{"name": "Prótesis total cadera", "price": 266.5}, {"name": "Prótesis total rodilla", "price": 266.5}, {"name": "Artroscopia de hombro + reparación hombro", "price": 282.0}, {"name": "Artroscopia SIMPLE de hombro", "price": 159.25}, {"name": "LCA (Ligamentoplastia cruzado rodilla)", "price": 282.0}, {"name": "Fractura de cadera (Clavo gamma / PPC)", "price": 206.5}, {"name": "Fractura de rodilla", "price": 206.5}, {"name": "Fractura de tibia/peroné/tobillo", "price": 206.5}, {"name": "Sutura tendón Aquiles", "price": 206.5}, {"name": "Fractura de clavícula/húmero", "price": 206.5}, {"name": "Fractura antebrazo/mano", "price": 206.5}, {"name": "Sutura tendinosa", "price": 206.5}, {"name": "Rizartrosis mano (artroplastia/artrodesis carpo-MTC)", "price": 206.5}, {"name": "Infección / Hematoma / Revisión de herida", "price": 206.5}, {"name": "Dupuytren", "price": 159.25}, {"name": "CAR (Artroscopia de rodilla)", "price": 114.75}, {"name": "Artroscopia de tobillo", "price": 114.75}, {"name": "Hallux valgus / rigidus / Metatarsalgia", "price": 105.25}, {"name": "EMO", "price": 82.25}, {"name": "Túnel del carpo", "price": 70.5}, {"name": "Dedo en resorte / Dedo en martillo", "price": 70.5}, {"name": "Quistes / Gangliones / Exóstosis", "price": 70.5}, {"name": "Infiltración intraarticular cadera", "price": 70.5}], "CPL (CIRUGÍA PLÁSTICA)": [{"name": "Cirugía plástica (x PROCEDIMIENTO)", "price": 320.0}], "DIG (ENDOSCOPIAS DIGESTIVAS)": [{"name": "Gastroenterología tardes (PRECIO FIJO)", "price": 400.0}, {"name": "Gastroenterología mañanas (PRECIO FIJO)", "price": 400.0}], "GIN (GINECOLOGÍA)": [{"name": "Histerectomía vaginal + cistorectocele", "price": 362.02}, {"name": "Histerectomía vaginal + cistorectocele/rectocele + TOT", "price": 362.02}, {"name": "Histerectomía vaginal + Cistocele", "price": 264.5}, {"name": "Histerectomía vaginal + Rectocele", "price": 264.5}, {"name": "Histerectomía vaginal", "price": 166.98}, {"name": "Histerectomía LAPAROSCÓPICA", "price": 333.96}, {"name": "Histerectomia x LAPAROTOMÍA", "price": 255.53}, {"name": "Miomectomía LAPAROSCÓPICA", "price": 333.96}, {"name": "Miomectomía x LAPAROTOMÍA", "price": 166.98}, {"name": "Mastectomía simple", "price": 255.53}, {"name": "Colpocleisis de LeFort", "price": 195.04}, {"name": "Cistorectocele", "price": 195.04}, {"name": "Richter (colposuspensión)", "price": 195.04}, {"name": "LAPAROTOMÍA (cualquier procedimiento)", "price": 166.98}, {"name": "Histerectomía vaginal simple", "price": 166.98}, {"name": "Histeropexia vaginal", "price": 166.98}, {"name": "Manchester (Amputación cervical)", "price": 166.98}, {"name": "Fistulectomía mamaria", "price": 97.52}, {"name": "Cistocele (Prolapso vesical)", "price": 97.52}, {"name": "Rectocele", "price": 97.52}, {"name": "Incontinencia urinaria de esfuerzo", "price": 97.52}, {"name": "Banda suburetral libre de tensión (TOT)", "price": 97.52}, {"name": "HISTEROSCOPIA QUIRÚRGICA", "price": 90.39}, {"name": "Radiofrecuencia miomas uterinos", "price": 90.39}, {"name": "Novasure (Ablación endometrial por radiofrecuencia)", "price": 90.39}, {"name": "Ligadura trompas LAPAROSCÓPICA", "price": 88.55}, {"name": "Laparoscopia ovario", "price": 88.55}, {"name": "Anexectomía unilateral o bilateral LAPAROSCÓPICA", "price": 88.55}, {"name": "Quistectomía de ovario uni o bilateral LAPAROSCÓPICA", "price": 88.55}, {"name": "Hidrosálpinx unilateral o bilateral LAPAROSCÓPICO", "price": 88.55}, {"name": "Miomas uterinos", "price": 57.04}, {"name": "Ligadura trompas", "price": 50.14}, {"name": "Conización + Vaporización láser", "price": 75.44}, {"name": "Tumorectomía mama", "price": 37.72}, {"name": "Bartholino", "price": 37.72}, {"name": "Conización", "price": 37.72}, {"name": "Vaporización láser", "price": 37.72}, {"name": "Resección vulvar", "price": 37.72}, {"name": "Resección vaginal", "price": 37.72}, {"name": "Histeroscopia diagnóstica", "price": 33.35}], "MXF (MAXILOFACIAL)": [{"name": "Extracción cordales (x PROCEDIMIENTO)", "price": 115.0}], "OFT (OFTALMOLOGÍA)": [{"name": "Cataratas (x PROCEDIMIENTO)", "price": 50.0}], "URO (UROLOGÍA)": [{"name": "HoLEP (Próstata láser)", "price": 359.0}, {"name": "RTU próstata", "price": 201.5}, {"name": "RTU próstata + RTU vejiga", "price": 201.5}, {"name": "Ureteroscopia (URS)", "price": 201.5}, {"name": "Cistolitotricia", "price": 274.38}, {"name": "Adenomectomía prostática (Millin) 1 URÓLOGO", "price": 274.38}, {"name": "Adenomectomía prostática (Millin) 2 URÓLOGOS", "price": 180.25}, {"name": "Uretrotomía endoscópica", "price": 201.5}, {"name": "Glandectomía", "price": 201.5}, {"name": "RTU vejiga", "price": 146.5}, {"name": "Hidrodistensión vesical", "price": 146.5}, {"name": "Recorte de malla de incontinencia", "price": 146.5}, {"name": "Hidrocele", "price": 145.0}, {"name": "Prótesis testicular", "price": 145.0}, {"name": "Orquiectomía", "price": 94.0}, {"name": "Circuncisión (SÓLO SI PRECISA SEDACIÓN)", "price": 28.0}], "RESONANCIA MAGNÉTICA": [{"name": "RMN sedación (PRECIO FIJO)", "price": 400.0}], "NCR (NEUROCIRUGÍA)": [{"name": "Hernia discal 1 nivel", "price": 366.24}, {"name": "Hernia discal 2 niveles", "price": 380.51}, {"name": "Hernia discal 3 niveles", "price": 399.53}], "CIRUGIA TORÁCICA": [{"name": "Segmentectomía pulmonar VATS", "price": 275.0}]};
+const PRECIO_TRIENIO = 53.39;
+const GUARDIAS = {
+  locDiario: 209.27,
+  presDiario: 418.54,
+  locFestivo: 323.52,
+  presFestivo: 647.04
+};
+const STORAGE_KEY = "nominas_pdh_v9";
+const SESSION_RESTORE_KEY = "nominas_pdh_restore_session";
+
+function parseAmount(value) {
+  if (value === null || value === undefined) return 0;
+  let s = String(value).trim();
+  if (!s) return 0;
+  s = s.replace(/€/g, "").replace(/\s/g, "");
+  const hasComma = s.includes(",");
+  const hasDot = s.includes(".");
+  if (hasComma && hasDot) {
+    if (s.lastIndexOf(",") > s.lastIndexOf(".")) {
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else {
+      s = s.replace(/,/g, "");
+    }
+  } else if (hasComma) {
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else {
+    const parts = s.split(".");
+    if (parts.length > 2) s = parts.join("");
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+function parseIntSafe(value) {
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : 0;
+}
+function formatEuro(value) {
+  return new Intl.NumberFormat("es-ES", {
+    style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+function formatNum(value) {
+  return new Intl.NumberFormat("es-ES", {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+
+function createTrienioOptions() {
+  const sel = document.getElementById("numTrienios");
+  sel.innerHTML = "";
+  for (let i = 0; i <= 10; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = i;
+    sel.appendChild(opt);
+  }
+}
+
+function fillCategoryOptions() {
+  const sel = document.getElementById("pCategory");
+  sel.innerHTML = '<option value="">Selecciona</option>';
+  Object.keys(PEONADAS_DATA).forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    sel.appendChild(opt);
+  });
+}
+
+
+function fillSurgeryOptions() {
+  const cat = document.getElementById("pCategory").value;
+  const sel = document.getElementById("pSurgery");
+  sel.innerHTML = '<option value="">Selecciona</option>';
+  if (!cat || !PEONADAS_DATA[cat]) return;
+  PEONADAS_DATA[cat].forEach((item, idx) => {
+    const opt = document.createElement("option");
+    opt.value = idx;
+    opt.textContent = `${item.name} — ${formatEuro(item.price)}`;
+    sel.appendChild(opt);
+  });
+}
+
+
+function updateSelectedProcedureInfo() {
+  const cat = document.getElementById("pCategory").value;
+  const surgeryIdx = document.getElementById("pSurgery").value;
+  const qty = Math.max(1, parseIntSafe(document.getElementById("pQty").value || "1"));
+  const box = document.getElementById("pSelectedPrice");
+  if (!cat || surgeryIdx === "" || !PEONADAS_DATA[cat] || !PEONADAS_DATA[cat][Number(surgeryIdx)]) {
+    box.textContent = "Selecciona una cirugía para ver su importe antes de añadirla.";
+    return;
+  }
+  const item = PEONADAS_DATA[cat][Number(surgeryIdx)];
+  box.textContent = `Importe procedimiento: ${formatEuro(item.price)} · Cantidad: ${qty} · Total a añadir: ${formatEuro(item.price * qty)}`;
+}
+
+
+window.handlePeonadaCategoryChange = function () {
+  fillSurgeryOptions();
+  const surgerySelect = document.getElementById("pSurgery");
+  if (surgerySelect) surgerySelect.value = "";
+  const qtyInput = document.getElementById("pQty");
+  if (qtyInput && (!qtyInput.value || Number(qtyInput.value) < 1)) qtyInput.value = "1";
+  updateSelectedProcedureInfo();
+  saveState();
+};
+
+function addSelectedSurgeryToDetail() {
+  const cat = document.getElementById("pCategory").value;
+  const surgeryIdx = document.getElementById("pSurgery").value;
+  const qty = Math.max(1, parseIntSafe(document.getElementById("pQty").value || "1"));
+  if (!cat || surgeryIdx === "" || !PEONADAS_DATA[cat]) return false;
+  const item = PEONADAS_DATA[cat][Number(surgeryIdx)];
+  if (!item) return false;
+  const state = getDetailState();
+  state.items.push({
+    category: cat,
+    name: item.name,
+    qty,
+    unit: item.price,
+    total: item.price * qty
+  });
+  document.getElementById("pSurgery").value = "";
+  document.getElementById("pQty").value = "1";
+  renderDetailList();
+  updateSelectedProcedureInfo();
+  recalc();
+  return true;
+}
+window.addSelectedSurgeryToDetail = addSelectedSurgeryToDetail;
+
+
+
+function getIncidenciasState() {
+  if (!window._incidenciasState) window._incidenciasState = { items: [] };
+  return window._incidenciasState;
+}
+
+function getPeriodInfo(period) {
+  if (!period || !/^\d{4}-\d{2}$/.test(period)) return null;
+  const [y, m] = period.split("-").map(Number);
+  const lastDay = new Date(y, m, 0).getDate();
+  return {
+    year: y,
+    month: m,
+    totalDays: lastDay,
+    start: `${y}-${String(m).padStart(2, "0")}-01`,
+    end: `${y}-${String(m).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`
+  };
+}
+
+function dateRangeDays(start, end) {
+  const out = [];
+  const current = new Date(`${start}T00:00:00`);
+  const last = new Date(`${end}T00:00:00`);
+  while (current <= last) {
+    const y = current.getFullYear();
+    const m = String(current.getMonth() + 1).padStart(2, "0");
+    const d = String(current.getDate()).padStart(2, "0");
+    out.push(`${y}-${m}-${d}`);
+    current.setDate(current.getDate() + 1);
+  }
+  return out;
+}
+
+function getIncidenceEffectiveRange(item, periodInfo) {
+  if (!item || !periodInfo) return null;
+  const start = item.start > periodInfo.start ? item.start : periodInfo.start;
+  const end = item.end < periodInfo.end ? item.end : periodInfo.end;
+  if (start > end) return null;
+  return { start, end };
+}
+
+function getIncidenceCoveredDaysSet() {
+  const set = new Set();
+  const periodInfo = getPeriodInfo(document.getElementById("periodoNomina")?.value || "");
+  getIncidenciasState().items.forEach(item => {
+    const effective = getIncidenceEffectiveRange(item, periodInfo);
+    if (!effective) return;
+    dateRangeDays(effective.start, effective.end).forEach(day => set.add(day));
+  });
+  return set;
+}
+
+function getIncidenciasTotal() {
+  return getIncidenciasState().items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+}
+
+function showIncidencesError(message) {
+  const box = document.getElementById("incidencesError");
+  if (!box) return;
+  box.textContent = message || "";
+  box.style.display = message ? "block" : "none";
+}
+
+function renderIncidencesList() {
+  const list = document.getElementById("incidencesList");
+  const state = getIncidenciasState();
+  const periodInfo = getPeriodInfo(document.getElementById("periodoNomina")?.value || "");
+  if (!state.items.length) {
+    list.innerHTML = '<div class="muted">Sin incidencias añadidas todavía.</div>';
+  } else {
+    list.innerHTML = state.items.map((item, idx) => {
+      const effective = getIncidenceEffectiveRange(item, periodInfo);
+      const days = effective ? dateRangeDays(effective.start, effective.end).length : 0;
+      const rangeNote = effective && (effective.start !== item.start || effective.end !== item.end)
+        ? ` · computa ${effective.start.split("-").reverse().join("/")} - ${effective.end.split("-").reverse().join("/")}`
+        : "";
+      return `
+        <div class="incidence-item-card">
+          <div class="incidence-meta">
+            <div>
+              <div class="incidence-type-badge">${item.type}</div>
+              <div style="margin-top:8px;"><strong>${item.start.split("-").reverse().join("/")} - ${item.end.split("-").reverse().join("/")}</strong></div>
+              <div class="muted">${days} día(s) afectados${rangeNote}${item.notes ? " · " + item.notes : ""}</div>
+            </div>
+            <div class="right">
+              <div class="money" style="font-size:16px;">${formatEuro(item.amount)}</div>
+              <button type="button" class="btn small secondary remove-incidence" data-index="${idx}" style="margin-top:8px;">Quitar</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+  list.querySelectorAll(".remove-incidence").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseIntSafe(btn.dataset.index);
+      state.items.splice(idx, 1);
+      renderIncidencesList();
+      recalc();
+    });
+  });
+  updateIncidenceSummary();
+}
+
+function updateIncidenceSummary() {
+  const period = document.getElementById("periodoNomina")?.value || "";
+  const info = getPeriodInfo(period);
+  const totalDays = info?.totalDays || 0;
+  const incidenceDays = getIncidenceCoveredDaysSet().size;
+  document.getElementById("incidenceDaysTotal").textContent = totalDays ? String(totalDays) : "0";
+  document.getElementById("incidenceDaysAffected").textContent = String(incidenceDays);
+  document.getElementById("totalIncidences").textContent = formatEuro(getIncidenciasTotal());
+}
+
+function addIncidence() {
+  const period = document.getElementById("periodoNomina").value;
+  const type = document.getElementById("incidenceType").value;
+  const start = document.getElementById("incidenceStart").value;
+  const end = document.getElementById("incidenceEnd").value;
+  const amount = parseAmount(document.getElementById("incidenceAmount").value);
+  const notes = document.getElementById("incidenceNotes").value.trim();
+  const info = getPeriodInfo(period);
+  if (!info) {
+    showIncidencesError("Selecciona antes el periodo de la nómina para poder prorratear las incidencias.");
+    return false;
+  }
+  if (!type || !start || !end) {
+    showIncidencesError("Completa tipo de incidencia y fechas.");
+    return false;
+  }
+  if (start > end) {
+    showIncidencesError("La fecha de inicio no puede ser posterior a la fecha de fin.");
+    return false;
+  }
+  const effective = getIncidenceEffectiveRange({ start, end }, info);
+  if (!effective) {
+    showIncidencesError("La incidencia no afecta al periodo seleccionado. Ajusta las fechas o cambia el periodo.");
+    return false;
+  }
+  if (amount < 0) {
+    showIncidencesError("La remuneración de la incidencia no puede ser negativa.");
+    return false;
+  }
+  const newDays = dateRangeDays(effective.start, effective.end);
+  const existing = getIncidenceCoveredDaysSet();
+  if (newDays.some(day => existing.has(day))) {
+    showIncidencesError("Esa incidencia se solapa con otra que ya habías añadido dentro de este periodo.");
+    return false;
+  }
+  showIncidencesError("");
+  getIncidenciasState().items.push({ type, start, end, amount, notes });
+  document.getElementById("incidenceType").value = "";
+  document.getElementById("incidenceStart").value = "";
+  document.getElementById("incidenceEnd").value = "";
+  document.getElementById("incidenceAmount").value = "";
+  document.getElementById("incidenceNotes").value = "";
+  renderIncidencesList();
+  recalc();
+  saveState();
+  return true;
+}
+
+function clearGuardias() {
+  document.getElementById("gLocDiario").value = "";
+  document.getElementById("gPresDiario").value = "";
+  document.getElementById("gLocFestivo").value = "";
+  document.getElementById("gPresFestivo").value = "";
+  recalc();
+}
+
+function clearPeonadas() {
+  getDetailState().items = [];
+  document.getElementById("pCategory").value = "";
+  fillSurgeryOptions();
+  toggleExtraCustomField();
+  document.getElementById("pQty").value = "1";
+  document.getElementById("peonadasManual").value = "";
+  renderDetailList();
+  updateSelectedProcedureInfo();
+  recalc();
+}
+
+function monthClean() {
+  clearGuardias();
+  document.getElementById("trasplante").value = "";
+  clearPeonadas();
+  document.getElementById("irpf").value = "";
+  recalc();
+}
+
+function getDetailState() {
+  if (!window._detailState) window._detailState = { items: [] };
+  return window._detailState;
+}
+
+function getExtrasState() {
+  if (!window._extrasState) window._extrasState = { items: [] };
+  return window._extrasState;
+}
+
+function getExtraLabel() {
+  const type = document.getElementById("extraType").value;
+  if (type === "Otro") {
+    return document.getElementById("extraCustomName").value.trim();
+  }
+  return type;
+}
+
+
+function showExtrasError(message) {
+  const box = document.getElementById("extrasError");
+  if (!box) return;
+  box.textContent = message || "";
+  box.style.display = message ? "block" : "none";
+}
+
+function toggleExtraCustomField() {
+  const wrap = document.getElementById("extraCustomWrap");
+  const isOther = document.getElementById("extraType").value === "Otro";
+  wrap.style.display = isOther ? "flex" : "none";
+  if (!isOther) document.getElementById("extraCustomName").value = "";
+}
+
+function renderDetailList() {
+  const list = document.getElementById("detailList");
+  const state = getDetailState();
+  if (!state.items.length) {
+    list.innerHTML = '<div class="muted">Sin procedimientos añadidos todavía.</div>';
+  } else {
+    list.innerHTML = state.items.map((item, idx) => `
+      <div class="surgery-item">
+        <div>
+          <div><strong>${item.category}</strong></div>
+          <div class="muted">${item.name} · Cantidad: ${item.qty}</div>
+        </div>
+        <div class="right">
+          <div class="money" style="font-size:16px;">${formatEuro(item.total)}</div>
+          <button type="button" class="btn small secondary remove-detail" data-index="${idx}" style="margin-top:8px;">Quitar</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  list.querySelectorAll(".remove-detail").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseIntSafe(btn.dataset.index);
+      state.items.splice(idx, 1);
+      renderDetailList();
+      recalc();
+    });
+  });
+}
+
+function renderExtrasList() {
+  const list = document.getElementById("extrasList");
+  const state = getExtrasState();
+  if (!state.items.length) {
+    list.innerHTML = '<div class="muted">Sin otros conceptos añadidos todavía.</div>';
+  } else {
+    list.innerHTML = state.items.map((item, idx) => `
+      <div class="surgery-item">
+        <div>
+          <div><strong>${item.label}</strong></div>
+          <div class="muted">Importe manual no ajustado por jornada</div>
+        </div>
+        <div class="right">
+          <div class="money" style="font-size:16px;">${formatEuro(item.amount)}</div>
+          <button type="button" class="btn small secondary remove-extra" data-index="${idx}" style="margin-top:8px;">Quitar</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  list.querySelectorAll(".remove-extra").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseIntSafe(btn.dataset.index);
+      state.items.splice(idx, 1);
+      renderExtrasList();
+      recalc();
+    });
+  });
+}
+
+function getExtrasTotal() {
+  return getExtrasState().items.reduce((sum, item) => sum + item.amount, 0);
+}
+
+function getBaseBreakdown() {
+  const salarioBase = parseAmount(document.getElementById("salarioBase").value);
+  const jornada = parseAmount(document.getElementById("jornada").value) || 100;
+  const factorJornada = jornada / 100;
+  const numTrienios = parseIntSafe(document.getElementById("numTrienios").value);
+  const trienios = numTrienios * PRECIO_TRIENIO;
+  const carrera = parseAmount(document.getElementById("carrera").value);
+  const destino = parseAmount(document.getElementById("complementoDestino").value);
+  const especifico = parseAmount(document.getElementById("complementoEspecifico").value);
+  const prodFija = parseAmount(document.getElementById("productividadFija").value);
+  const prodVinc = parseAmount(document.getElementById("productividadVinculacion").value);
+  const prodAMS = parseAmount(document.getElementById("productividadAMS").value);
+  const baseCompleta = salarioBase + trienios + carrera + destino + especifico + prodFija + prodVinc + prodAMS;
+  const baseAjustada = baseCompleta * factorJornada;
+  document.getElementById("detalleTrienios").textContent = `${numTrienios} × ${formatNum(PRECIO_TRIENIO)} € = ${formatEuro(trienios)}`;
+  document.getElementById("baseCompletaInfo").textContent = formatEuro(baseCompleta);
+  return { baseCompleta, baseAjustada, jornada };
+}
+
+function getBaseTotal() {
+  return getBaseBreakdown().baseAjustada;
+}
+
+function getGuardiasTotal() {
+  return (
+    parseIntSafe(document.getElementById("gLocDiario").value) * GUARDIAS.locDiario +
+    parseIntSafe(document.getElementById("gPresDiario").value) * GUARDIAS.presDiario +
+    parseIntSafe(document.getElementById("gLocFestivo").value) * GUARDIAS.locFestivo +
+    parseIntSafe(document.getElementById("gPresFestivo").value) * GUARDIAS.presFestivo
+  );
+}
+
+function getTrasplanteTotal() {
+  return parseAmount(document.getElementById("trasplante").value);
+}
+
+function getPeonadasDetalleTotal() {
+  return getDetailState().items.reduce((sum, item) => sum + item.total, 0);
+}
+
+function getPeonadasManualTotal() {
+  return parseAmount(document.getElementById("peonadasManual").value);
+}
+
+
+function getComputedData() {
+  const { baseCompleta, baseAjustada, jornada } = getBaseBreakdown();
+  const guardias = getGuardiasTotal();
+  const trasplante = getTrasplanteTotal();
+  const peonadasDetalle = getPeonadasDetalleTotal();
+  const peonadasManual = getPeonadasManualTotal();
+  const peonadas = peonadasDetalle + peonadasManual;
+  const extras = getExtrasTotal();
+  const incidencias = getIncidenciasTotal();
+
+  const period = document.getElementById("periodoNomina")?.value || "";
+  const periodInfo = getPeriodInfo(period);
+  const totalDays = periodInfo?.totalDays || 0;
+  const incidenceDays = periodInfo ? getIncidenceCoveredDaysSet().size : 0;
+  const workedDays = periodInfo ? Math.max(totalDays - incidenceDays, 0) : totalDays;
+  const prorationFactor = periodInfo && totalDays > 0 ? (workedDays / totalDays) : 1;
+  const base = baseAjustada * prorationFactor;
+
+  const bruto = base + guardias + trasplante + peonadas + incidencias + extras;
+  const irpfPct = parseAmount(document.getElementById("irpf").value);
+  const retencion = bruto * (irpfPct / 100);
+  const neto = bruto - retencion;
+  return {
+    incidenciasItems: JSON.parse(JSON.stringify(getIncidenciasState().items || [])),
+    totalDays,
+    incidenceDays,
+    workedDays,
+    prorationFactor,
+    base,
+    baseCompleta,
+    jornada,
+    guardias,
+    trasplante,
+    peonadasDetalle,
+    peonadasManual,
+    peonadas,
+    incidencias,
+    extras,
+    bruto,
+    irpfPct,
+    retencion,
+    neto,
+    isSpecialMode: false
+  };
+}
+
+function getCurrentPayrollState() {
+
+  return {
+    periodoNomina: document.getElementById("periodoNomina").value,
+    salarioBase: document.getElementById("salarioBase").value,
+    jornada: document.getElementById("jornada").value,
+    numTrienios: document.getElementById("numTrienios").value,
+    carrera: document.getElementById("carrera").value,
+    complementoDestino: document.getElementById("complementoDestino").value,
+    complementoEspecifico: document.getElementById("complementoEspecifico").value,
+    productividadFija: document.getElementById("productividadFija").value,
+    productividadVinculacion: document.getElementById("productividadVinculacion").value,
+    productividadAMS: document.getElementById("productividadAMS").value,
+    gLocDiario: document.getElementById("gLocDiario").value,
+    gPresDiario: document.getElementById("gPresDiario").value,
+    gLocFestivo: document.getElementById("gLocFestivo").value,
+    gPresFestivo: document.getElementById("gPresFestivo").value,
+    trasplante: document.getElementById("trasplante").value,
+    peonadasManual: document.getElementById("peonadasManual").value,
+    irpf: document.getElementById("irpf").value,
+    pCategory: document.getElementById("pCategory").value,
+    pSurgery: document.getElementById("pSurgery").value,
+    pQty: document.getElementById("pQty").value,
+    extraType: document.getElementById("extraType").value,
+    extraCustomName: document.getElementById("extraCustomName").value,
+    extraAmount: document.getElementById("extraAmount").value,
+    incidenceType: document.getElementById("incidenceType").value,
+    incidenceStart: document.getElementById("incidenceStart").value,
+    incidenceEnd: document.getElementById("incidenceEnd").value,
+    incidenceAmount: document.getElementById("incidenceAmount").value,
+    incidenceNotes: document.getElementById("incidenceNotes").value,
+    detailItems: JSON.parse(JSON.stringify(getDetailState().items || [])),
+    extraItems: JSON.parse(JSON.stringify(getExtrasState().items || [])),
+    incidenciasItems: JSON.parse(JSON.stringify(getIncidenciasState().items || []))
+  };
+}
+
+
+function applyPayrollState(state) {
+  if (!state) return;
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el && value !== undefined && value !== null) el.value = value;
+  };
+  set("periodoNomina", state.periodoNomina);
+  set("salarioBase", state.salarioBase);
+  set("jornada", state.jornada);
+  set("numTrienios", state.numTrienios);
+  set("carrera", state.carrera);
+  set("complementoDestino", state.complementoDestino);
+  set("complementoEspecifico", state.complementoEspecifico);
+  set("productividadFija", state.productividadFija);
+  set("productividadVinculacion", state.productividadVinculacion);
+  set("productividadAMS", state.productividadAMS);
+  set("gLocDiario", state.gLocDiario);
+  set("gPresDiario", state.gPresDiario);
+  set("gLocFestivo", state.gLocFestivo);
+  set("gPresFestivo", state.gPresFestivo);
+  set("trasplante", state.trasplante);
+  set("peonadasManual", state.peonadasManual);
+  set("irpf", state.irpf);
+  set("pCategory", state.pCategory || "");
+  fillSurgeryOptions();
+  set("pSurgery", state.pSurgery || "");
+  set("pQty", state.pQty || "1");
+  set("extraType", state.extraType || "");
+  toggleExtraCustomField();
+  set("extraCustomName", state.extraCustomName || "");
+  set("extraAmount", state.extraAmount || "");
+  set("incidenceType", state.incidenceType || "");
+  set("incidenceStart", state.incidenceStart || "");
+  set("incidenceEnd", state.incidenceEnd || "");
+  set("incidenceAmount", state.incidenceAmount || "");
+  set("incidenceNotes", state.incidenceNotes || "");
+  window._detailState = { items: Array.isArray(state.detailItems) ? state.detailItems : [] };
+  window._extrasState = { items: Array.isArray(state.extraItems) ? state.extraItems : [] };
+  window._incidenciasState = { items: Array.isArray(state.incidenciasItems) ? state.incidenciasItems : [] };
+  renderDetailList();
+  renderExtrasList();
+  renderIncidencesList();
+  updateSelectedProcedureInfo();
+  recalc();
+}
+
+
+function recalc() {
+  const data = getComputedData();
+  const { base, guardias, trasplante, peonadasDetalle, peonadasManual, peonadas, incidencias, extras, bruto, retencion, neto } = data;
+
+  document.getElementById("subtotalLocDiario").textContent = formatEuro(parseIntSafe(document.getElementById("gLocDiario").value) * GUARDIAS.locDiario);
+  document.getElementById("subtotalPresDiario").textContent = formatEuro(parseIntSafe(document.getElementById("gPresDiario").value) * GUARDIAS.presDiario);
+  document.getElementById("subtotalLocFestivo").textContent = formatEuro(parseIntSafe(document.getElementById("gLocFestivo").value) * GUARDIAS.locFestivo);
+  document.getElementById("subtotalPresFestivo").textContent = formatEuro(parseIntSafe(document.getElementById("gPresFestivo").value) * GUARDIAS.presFestivo);
+  document.getElementById("totalBase").textContent = formatEuro(base);
+  document.getElementById("totalGuardias").textContent = formatEuro(guardias);
+  document.getElementById("totalTrasplante").textContent = formatEuro(trasplante);
+  document.getElementById("totalPeonadasDetalle").textContent = formatEuro(peonadasDetalle);
+  document.getElementById("totalPeonadasManual").textContent = formatEuro(peonadasManual);
+  document.getElementById("totalPeonadas").textContent = formatEuro(peonadas);
+  document.getElementById("totalIncidences").textContent = formatEuro(incidencias);
+  document.getElementById("totalExtras").textContent = formatEuro(extras);
+
+  document.getElementById("resBase").textContent = formatEuro(base);
+  document.getElementById("resGuardias").textContent = formatEuro(guardias);
+  document.getElementById("resTrasplante").textContent = formatEuro(trasplante);
+  document.getElementById("resPeonadas").textContent = formatEuro(peonadas);
+  document.getElementById("resIncidencias").textContent = formatEuro(incidencias);
+  document.getElementById("resExtras").textContent = formatEuro(extras);
+  document.getElementById("brutoTotal").textContent = formatEuro(bruto);
+  document.getElementById("retencionTotal").textContent = formatEuro(retencion);
+  document.getElementById("netoTotal").textContent = formatEuro(neto);
+  document.getElementById("proratedBaseInfo").textContent = formatEuro(base);
+
+  document.getElementById("duplicateWarning").style.display = (peonadasDetalle > 0 && peonadasManual > 0) ? "block" : "none";
+  updateIncidenceSummary();
+  updateSelectedProcedureInfo();
+  saveState();
+}
+
+const MONTH_TYPE_META = {
+  normal: {
+    help: "Mes normal: cálculo completo",
+    sub: "La calculadora funciona con todos los conceptos habituales.",
+    incomeLabel: "Ingreso real del mes (€)",
+    badge: "Mes normal",
+    showSpecial: false,
+    showConvenio: false
+  },
+  baja_medica: {
+    help: "Baja médica: ingreso real + complemento de convenio",
+    sub: "Se desactivan guardias, peonadas, trasplante y otros conceptos de actividad. Registra el ingreso real del mes y, si existió, el complemento de convenio.",
+    incomeLabel: "Ingreso real del mes (€)",
+    badge: "Baja médica",
+    showSpecial: true,
+    showConvenio: true
+  },
+  accidente_laboral: {
+    help: "Accidente laboral: ingreso real + complemento de convenio",
+    sub: "Se desactivan los conceptos de actividad. Registra el ingreso del mes y el posible complemento de convenio o ajuste.",
+    incomeLabel: "Ingreso real del mes (€)",
+    badge: "Accidente laboral",
+    showSpecial: true,
+    showConvenio: true
+  },
+  maternidad_paternidad: {
+    help: "Maternidad / Paternidad: ingreso del INSS",
+    sub: "Se desactiva el cálculo normal. Introduce solo el ingreso mensual que recibes del INSS.",
+    incomeLabel: "Ingreso mensual INSS (€)",
+    badge: "Maternidad / Paternidad",
+    showSpecial: true,
+    showConvenio: false
+  },
+  riesgo_embarazo: {
+    help: "Riesgo durante el embarazo: ingreso del INSS",
+    sub: "Se desactiva el cálculo normal. Introduce solo el ingreso mensual que recibes del INSS.",
+    incomeLabel: "Ingreso mensual INSS (€)",
+    badge: "Riesgo embarazo",
+    showSpecial: true,
+    showConvenio: false
+  },
+  manual: {
+    help: "Mes manual: ingreso total registrado a mano",
+    sub: "Usa esta opción si prefieres registrar directamente lo cobrado en el mes sin usar la calculadora completa.",
+    incomeLabel: "Ingreso manual del mes (€)",
+    badge: "Mes manual",
+    showSpecial: true,
+    showConvenio: false
+  }
+};
+
+
+function updateMonthTypeUi() {
+  return;
+}
+
+
+function buildSummaryText() {
+  const { base, baseCompleta, jornada, guardias, trasplante, peonadas, incidencias, extras, bruto, irpfPct, retencion, neto, totalDays, incidenceDays, workedDays } = getComputedData();
+  const periodo = document.getElementById("periodoNomina")?.value || "";
+  const extraLines = getExtrasState().items.map(item => `- ${item.label}: ${formatEuro(item.amount)}`);
+  const incidenceLines = getIncidenciasState().items.map(item => `- ${item.type} (${item.start} a ${item.end}): ${formatEuro(item.amount)}`);
+  return [
+    "Nomina$ Puerta de Hierro",
+    periodo ? `Periodo: ${periodo}` : "",
+    "",
+    `Base completa: ${formatEuro(baseCompleta)}`,
+    `Jornada: ${formatNum(jornada)} %`,
+    totalDays ? `Días del periodo: ${totalDays}` : "",
+    totalDays ? `Días con incidencia: ${incidenceDays}` : "",
+    totalDays ? `Días sin incidencia: ${workedDays}` : "",
+    `Base + complementos ajustado/prorrateado: ${formatEuro(base)}`,
+    `Guardias: ${formatEuro(guardias)}`,
+    `Trasplante: ${formatEuro(trasplante)}`,
+    `Peonadas: ${formatEuro(peonadas)}`,
+    `Incidencias: ${formatEuro(incidencias)}`,
+    ...incidenceLines,
+    `Otros conceptos: ${formatEuro(extras)}`,
+    ...extraLines,
+    `Bruto total: ${formatEuro(bruto)}`,
+    `IRPF: ${formatNum(irpfPct)} %`,
+    `Retención: ${formatEuro(retencion)}`,
+    `Neto estimado: ${formatEuro(neto)}`
+  ].filter(Boolean).join('\n');
+}
+
+async function copySummary() {
+  const text = buildSummaryText();
+  const notice = document.getElementById("copyNotice");
+  try {
+    await navigator.clipboard.writeText(text);
+    notice.textContent = "Resumen copiado.";
+  } catch (e) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    document.body.removeChild(area);
+    notice.textContent = "Resumen copiado.";
+  }
+  notice.style.display = "block";
+  setTimeout(() => { notice.style.display = "none"; }, 2000);
+}
+
+
+function resetAll() {
+  localStorage.removeItem(STORAGE_KEY);
+  window._detailState = { items: [] };
+  window._extrasState = { items: [] };
+  window._incidenciasState = { items: [] };
+  document.getElementById("periodoNomina").value = "";
+  document.getElementById("salarioBase").value = "1.387,24";
+  document.getElementById("jornada").value = "100";
+  document.getElementById("numTrienios").value = "0";
+  document.getElementById("carrera").value = "0";
+  document.getElementById("complementoDestino").value = "729,14";
+  document.getElementById("complementoEspecifico").value = "472,08";
+  document.getElementById("productividadFija").value = "553,00";
+  document.getElementById("productividadVinculacion").value = "488,80";
+  document.getElementById("productividadAMS").value = "396,61";
+  document.getElementById("gLocDiario").value = "";
+  document.getElementById("gPresDiario").value = "";
+  document.getElementById("gLocFestivo").value = "";
+  document.getElementById("gPresFestivo").value = "";
+  document.getElementById("trasplante").value = "";
+  document.getElementById("peonadasManual").value = "";
+  document.getElementById("extraType").value = "";
+  document.getElementById("extraCustomName").value = "";
+  document.getElementById("extraAmount").value = "";
+  document.getElementById("irpf").value = "";
+  document.getElementById("pCategory").value = "";
+  document.getElementById("incidenceType").value = "";
+  document.getElementById("incidenceStart").value = "";
+  document.getElementById("incidenceEnd").value = "";
+  document.getElementById("incidenceAmount").value = "";
+  document.getElementById("incidenceNotes").value = "";
+  fillSurgeryOptions();
+  document.getElementById("pQty").value = "1";
+  toggleExtraCustomField();
+  showExtrasError("");
+  showIncidencesError("");
+  renderDetailList();
+  renderExtrasList();
+  renderIncidencesList();
+  recalc();
+}
+
+function clearTransientPayrollState() {
+  sessionStorage.removeItem(SESSION_RESTORE_KEY);
+  localStorage.removeItem(STORAGE_KEY);
+  resetAll();
+}
+
+
+function saveState() {
+  const state = {
+    periodoNomina: document.getElementById("periodoNomina").value,
+    salarioBase: document.getElementById("salarioBase").value,
+    jornada: document.getElementById("jornada").value,
+    numTrienios: document.getElementById("numTrienios").value,
+    carrera: document.getElementById("carrera").value,
+    complementoDestino: document.getElementById("complementoDestino").value,
+    complementoEspecifico: document.getElementById("complementoEspecifico").value,
+    productividadFija: document.getElementById("productividadFija").value,
+    productividadVinculacion: document.getElementById("productividadVinculacion").value,
+    productividadAMS: document.getElementById("productividadAMS").value,
+    gLocDiario: document.getElementById("gLocDiario").value,
+    gPresDiario: document.getElementById("gPresDiario").value,
+    gLocFestivo: document.getElementById("gLocFestivo").value,
+    gPresFestivo: document.getElementById("gPresFestivo").value,
+    trasplante: document.getElementById("trasplante").value,
+    peonadasManual: document.getElementById("peonadasManual").value,
+    irpf: document.getElementById("irpf").value,
+    extraType: document.getElementById("extraType").value,
+    extraCustomName: document.getElementById("extraCustomName").value,
+    extraAmount: document.getElementById("extraAmount").value,
+    incidenceType: document.getElementById("incidenceType").value,
+    incidenceStart: document.getElementById("incidenceStart").value,
+    incidenceEnd: document.getElementById("incidenceEnd").value,
+    incidenceAmount: document.getElementById("incidenceAmount").value,
+    incidenceNotes: document.getElementById("incidenceNotes").value,
+    pCategory: document.getElementById("pCategory").value,
+    pSurgery: document.getElementById("pSurgery").value,
+    pQty: document.getElementById("pQty").value,
+    detailItems: getDetailState().items,
+    extraItems: getExtrasState().items,
+    incidenciasItems: getIncidenciasState().items
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+
+function restoreState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    const set = (id, value) => {
+      if (value !== undefined && value !== null) document.getElementById(id).value = value;
+    };
+    set("periodoNomina", state.periodoNomina);
+    set("salarioBase", state.salarioBase);
+    set("jornada", state.jornada);
+    set("numTrienios", state.numTrienios);
+    set("carrera", state.carrera);
+    set("complementoDestino", state.complementoDestino);
+    set("complementoEspecifico", state.complementoEspecifico);
+    set("productividadFija", state.productividadFija);
+    set("productividadVinculacion", state.productividadVinculacion);
+    set("productividadAMS", state.productividadAMS);
+    set("gLocDiario", state.gLocDiario);
+    set("gPresDiario", state.gPresDiario);
+    set("gLocFestivo", state.gLocFestivo);
+    set("gPresFestivo", state.gPresFestivo);
+    set("trasplante", state.trasplante);
+    set("peonadasManual", state.peonadasManual);
+    set("irpf", state.irpf);
+    set("extraType", state.extraType);
+    toggleExtraCustomField();
+    set("extraCustomName", state.extraCustomName);
+    set("extraAmount", state.extraAmount);
+    set("incidenceType", state.incidenceType);
+    set("incidenceStart", state.incidenceStart);
+    set("incidenceEnd", state.incidenceEnd);
+    set("incidenceAmount", state.incidenceAmount);
+    set("incidenceNotes", state.incidenceNotes);
+    set("pCategory", state.pCategory);
+    fillSurgeryOptions();
+    set("pSurgery", state.pSurgery);
+    set("pQty", state.pQty || "1");
+    window._detailState = { items: Array.isArray(state.detailItems) ? state.detailItems : [] };
+    window._extrasState = { items: Array.isArray(state.extraItems) ? state.extraItems : [] };
+    window._incidenciasState = { items: Array.isArray(state.incidenciasItems) ? state.incidenciasItems : [] };
+    renderDetailList();
+    renderExtrasList();
+    renderIncidencesList();
+    updateSelectedProcedureInfo();
+  } catch (e) {
+    console.warn("No se pudo restaurar el estado", e);
+  }
+}
+
+function wireInputs() {
+
+  document.querySelectorAll("#periodoNomina,#salarioBase,#jornada,#numTrienios,#carrera,#complementoDestino,#complementoEspecifico,#productividadFija,#productividadVinculacion,#productividadAMS,#gLocDiario,#gPresDiario,#gLocFestivo,#gPresFestivo,#trasplante,#peonadasManual,#irpf,#pQty,#extraAmount,#extraCustomName")
+    .forEach(el => {
+      el.addEventListener("input", recalc);
+      el.addEventListener("change", recalc);
+    });
+  document.getElementById("periodoNomina").addEventListener("input", checkExistingPeriodNotice);
+  document.getElementById("periodoNomina").addEventListener("change", checkExistingPeriodNotice);
+  document.getElementById("pCategory").addEventListener("change", () => {
+    fillSurgeryOptions();
+    updateSelectedProcedureInfo();
+    saveState();
+  });
+  document.getElementById("pSurgery").addEventListener("change", () => { updateSelectedProcedureInfo(); saveState(); });
+
+  document.getElementById("extraType").addEventListener("change", () => {
+    toggleExtraCustomField();
+    saveState();
+  });
+
+  const handleAddExtra = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const rawType = document.getElementById("extraType").value;
+    const label = getExtraLabel();
+    const amount = parseAmount(document.getElementById("extraAmount").value);
+    if (!rawType) {
+      showExtrasError("Selecciona primero el tipo de concepto manual.");
+      return false;
+    }
+    if (rawType === "Otro" && !label) {
+      showExtrasError("Escribe una descripción para el concepto personalizado.");
+      return false;
+    }
+    if (amount <= 0) {
+      showExtrasError("Introduce un importe mayor que cero para poder añadirlo.");
+      return false;
+    }
+    showExtrasError("");
+    getExtrasState().items.push({ label, amount });
+    document.getElementById("extraType").value = "";
+    document.getElementById("extraCustomName").value = "";
+    document.getElementById("extraAmount").value = "";
+    toggleExtraCustomField();
+    renderExtrasList();
+    recalc();
+    saveState();
+    return true;
+  };
+  document.getElementById("btnAddExtra").addEventListener("click", handleAddExtra);
+  document.getElementById("btnAddExtra").onclick = handleAddExtra;
+
+  document.getElementById("btnClearExtras").addEventListener("click", () => {
+    getExtrasState().items = [];
+    showExtrasError("");
+    renderExtrasList();
+    recalc();
+    saveState();
+  });
+
+  const btnAddSurgery = document.getElementById("btnAddSurgery");
+  if (btnAddSurgery) {
+    btnAddSurgery.onclick = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      addSelectedSurgeryToDetail();
+    };
+  }
+
+  document.getElementById("btnClearDetail").addEventListener("click", () => {
+    getDetailState().items = [];
+    renderDetailList();
+    recalc();
+  });
+
+  document.getElementById("btnAddIncidence").addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); addIncidence(); });
+  document.getElementById("btnAddIncidence").onclick = (e) => { e.preventDefault(); e.stopPropagation(); return addIncidence(); };
+  document.getElementById("btnClearIncidences").addEventListener("click", () => {
+    getIncidenciasState().items = [];
+    showIncidencesError("");
+    renderIncidencesList();
+    recalc();
+    saveState();
+  });
+  document.querySelectorAll("#incidenceType,#incidenceStart,#incidenceEnd,#incidenceAmount,#incidenceNotes").forEach(el => {
+    el.addEventListener("input", () => { showIncidencesError(""); saveState(); });
+    el.addEventListener("change", () => { showIncidencesError(""); saveState(); });
+  });
+  document.querySelectorAll("#extraType,#extraCustomName,#extraAmount").forEach(el => {
+    el.addEventListener("input", () => showExtrasError(""));
+    el.addEventListener("change", () => showExtrasError(""));
+  });
+
+  document.getElementById("btnCopy").addEventListener("click", copySummary);
+  document.getElementById("btnReset").addEventListener("click", resetAll);
+}
+
+window.getComputedData = getComputedData;
+window.formatEuro = formatEuro;
+window.buildSummaryText = buildSummaryText;
+window.getCurrentPayrollState = getCurrentPayrollState;
+window.applyPayrollState = applyPayrollState;
+
+createTrienioOptions();
+fillCategoryOptions();
+fillSurgeryOptions();
+toggleExtraCustomField();
+renderDetailList();
+renderExtrasList();
+renderIncidencesList();
+wireInputs();
+if (sessionStorage.getItem(SESSION_RESTORE_KEY) === "1") {
+  restoreState();
+} else {
+  localStorage.removeItem(STORAGE_KEY);
+}
+recalc();
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+  <footer style="margin-top:60px;padding:30px 10px;text-align:center;font-size:14px;color:#666;border-top:1px solid #ddd">
+    <div>Calculadora de Nóminas</div>
+    <div style="margin-top:6px">Diseñado por Diego Gutiérrez Martínez · 2026</div>
+    <div style="margin-top:10px">Los cálculos son orientativos y no sustituyen la nómina oficial.</div>
+    <div style="margin-top:10px">Contacto: <a href="mailto:diegogutimartinez@gmail.com">diegogutimartinez@gmail.com</a></div>
+    <div style="margin-top:10px"><a href="#" id="openPrivacyFooter">Política de privacidad</a></div>
+  </footer>
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  updateProfile,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  limit,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDO-lbWrDH_lcfAreyMJYOftnwl0AofsLI",
+  authDomain: "nominas-app-17d26.firebaseapp.com",
+  projectId: "nominas-app-17d26",
+  storageBucket: "nominas-app-17d26.firebasestorage.app",
+  messagingSenderId: "559867268667",
+  appId: "1:559867268667:web:ccc8d0da50cc8739bed61e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = (id) => document.getElementById(id);
+const authBox = $("authBox");
+const historyCard = $("historyCard");
+const authError = $("authError");
+const saveNotice = $("saveNotice");
+const authStatus = $("authStatus");
+const btnToggleAuth = $("btnToggleAuth");
+const btnSaveHistory = $("btnSaveHistory");
+const btnToggleHistory = $("btnToggleHistory");
+const btnLogout = $("btnLogout");
+const btnInstructions = $("btnInstructions");
+const btnToggleTheme = $("btnToggleTheme");
+const btnCloseInstructions = $("btnCloseInstructions");
+const instructionsModal = $("instructionsModal");
+const privacyModal = $("privacyModal");
+const btnClosePrivacy = $("btnClosePrivacy");
+const openPrivacyInline = $("openPrivacyInline");
+const openPrivacyFooter = $("openPrivacyFooter");
+const historyBody = $("historyBody");
+const historyMetricCount = $("historyMetricCount");
+const historyMetricLastNet = $("historyMetricLastNet");
+const historyMetricAvgNet = $("historyMetricAvgNet");
+const historyChartWrap = $("historyChartWrap");
+const historyPeonadasByYear = $("historyPeonadasByYear");
+const btnDownloadCsv = $("btnDownloadCsv");
+const btnDownloadPdf = $("btnDownloadPdf");
+const btnAccountMenu = $("btnAccountMenu");
+const accountMenu = $("accountMenu");
+const btnMenuAccount = $("btnMenuAccount");
+const btnMenuInstructions = $("btnMenuInstructions");
+const btnMenuTheme = $("btnMenuTheme");
+const btnMenuLogout = $("btnMenuLogout");
+
+const THEME_KEY = "nominas_theme_pref";
+
+function openModal(modal) {
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+function closeModal(modal) {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+function openAccountMenu() {
+  accountMenu.classList.add('open');
+  accountMenu.setAttribute('aria-hidden', 'false');
+}
+function closeAccountMenu() {
+  accountMenu.classList.remove('open');
+  accountMenu.setAttribute('aria-hidden', 'true');
+}
+function toggleAccountMenu() {
+  accountMenu.classList.toggle('open');
+  accountMenu.setAttribute('aria-hidden', accountMenu.classList.contains('open') ? 'false' : 'true');
+}
+function applyTheme(theme) {
+  const dark = theme === 'dark';
+  document.body.classList.toggle('dark-mode', dark);
+  if (btnToggleTheme) {
+    btnToggleTheme.textContent = dark ? 'Modo claro' : 'Modo oscuro';
+    btnToggleTheme.classList.toggle('theme-toggle-active', dark);
+  }
+  if (btnMenuTheme) {
+    btnMenuTheme.textContent = dark ? 'Modo claro' : 'Modo oscuro';
+  }
+}
+function toggleTheme() {
+  const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+async function getHistoryRows() {
+  const user = auth.currentUser;
+  if (!user) return [];
+  const q = query(collection(db, "users", user.uid, "nominas"), orderBy("periodo", "desc"), limit(60));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+function csvEscape(value) {
+  const text = String(value ?? "");
+  if (/[",\n;]/.test(text)) return '"' + text.replaceAll('"', '""') + '"';
+  return text;
+}
+
+async function downloadHistoryCsv() {
+  const rows = await getHistoryRows();
+  if (!rows.length) {
+    showAuthError('Todavía no hay historial para descargar.');
+    return;
+  }
+  const header = ['Periodo','Base + complementos','Guardias','Trasplante','Peonadas','Incidencias','Otros conceptos','Bruto','Neto','IRPF (%)'];
+  const lines = [header.join(';')];
+  rows.forEach(row => {
+    const t = row.totals || {};
+    lines.push([
+      row.periodo || row.id,
+      Number(t.base || 0).toFixed(2).replace('.', ','),
+      Number(t.guardias || 0).toFixed(2).replace('.', ','),
+      Number(t.trasplante || 0).toFixed(2).replace('.', ','),
+      Number(t.peonadas || 0).toFixed(2).replace('.', ','),
+      Number(t.incidencias || 0).toFixed(2).replace('.', ','),
+      Number(t.extras || 0).toFixed(2).replace('.', ','),
+      Number(t.bruto || 0).toFixed(2).replace('.', ','),
+      Number(t.neto || 0).toFixed(2).replace('.', ','),
+      Number(t.irpfPct || 0).toFixed(2).replace('.', ',')
+    ].map(csvEscape).join(';'));
+  });
+  const blob = new Blob(["\ufeff" + lines.join("\n")], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'historial-nominas.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function downloadHistoryPdf() {
+  const rows = await getHistoryRows();
+  if (!rows.length) {
+    showAuthError('Todavía no hay historial para descargar.');
+    return;
+  }
+  showAuthError('');
+  const user = auth.currentUser;
+  const profile = user ? await loadProfile(user) : null;
+  const name = getFriendlyUserName(user, profile);
+  const printable = document.createElement('div');
+  printable.style.position = 'fixed';
+  printable.style.left = '-10000px';
+  printable.style.top = '0';
+  printable.style.width = '1100px';
+  printable.style.background = '#ffffff';
+  printable.style.color = '#0f172a';
+  printable.style.padding = '24px';
+  printable.style.fontFamily = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
+  const generatedAt = new Date().toLocaleString('es-ES');
+  const tableRows = rows.map(row => {
+    const t = row.totals || {};
+    return `<tr>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${escapeHtml(formatPeriod(row.periodo || row.id))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.base || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.guardias || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.trasplante || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.peonadas || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.incidencias || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.extras || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;">${escapeHtml(window.formatEuro(t.bruto || 0))}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;font-weight:700;">${escapeHtml(window.formatEuro(t.neto || 0))}</td>
+    </tr>`;
+  }).join('');
+  printable.innerHTML = `
+    <div style="margin-bottom:18px;">
+      <h1 style="margin:0 0 6px;font-size:28px;">Historial de nóminas</h1>
+      <div style="font-size:14px;color:#475569;">Usuario: <strong>${escapeHtml(name || '')}</strong></div>
+      <div style="font-size:14px;color:#475569;">Generado: ${escapeHtml(generatedAt)}</div>
+    </div>
+    <div style="margin-bottom:18px;border:1px solid #e2e8f0;border-radius:16px;padding:16px;background:#f8fafc;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;">Comparativa visual por mes</div>
+      <div style="font-size:13px;color:#475569;margin-bottom:12px;">Cada barra representa el neto estimado del mes repartido proporcionalmente por conceptos.</div>
+      ${historyChartWrap.outerHTML}
+    </div>
+    <div style="border:1px solid #e2e8f0;border-radius:16px;padding:16px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:10px;">Tabla de historial</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:#f8fafc;">
+            <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Periodo</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Base + complementos</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Guardias</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Trasplante</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Peonadas</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Incidencias</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Otros</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Bruto</th>
+            <th style="padding:8px;text-align:right;border-bottom:1px solid #e2e8f0;">Neto</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>`;
+  document.body.appendChild(printable);
+  const canvas = await html2canvas(printable, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+  document.body.removeChild(printable);
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth - 20;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+  let heightLeft = imgHeight;
+  let position = 10;
+  const imgData = canvas.toDataURL('image/png');
+  pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+  heightLeft -= (pageHeight - 20);
+  while (heightLeft > 0) {
+    pdf.addPage();
+    position = 10 - (imgHeight - heightLeft);
+    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= (pageHeight - 20);
+  }
+  pdf.save('historial-nominas.pdf');
+}
+
+function showAuthError(message) {
+  authError.textContent = message || "";
+  authError.style.display = message ? "block" : "none";
+}
+
+function showSaveNotice(message) {
+  saveNotice.textContent = message;
+  saveNotice.style.display = "block";
+  setTimeout(() => { saveNotice.style.display = "none"; }, 2200);
+}
+
+function explainAuthError(error) {
+  const code = error?.code || "";
+  if (code.includes("wrong-password") || code.includes("invalid-credential") || code.includes("user-not-found")) return 'Email o contraseña incorrectos.';
+  if (code.includes("email-already-in-use")) return 'Ese email ya tiene una cuenta creada. Usa el bloque Entrar.';
+  if (code.includes("invalid-email")) return 'El email no tiene un formato válido.';
+  if (code.includes("weak-password")) return 'La contraseña debe tener al menos 6 caracteres.';
+  if (code.includes("too-many-requests")) return 'Demasiados intentos. Espera un momento y vuelve a probar.';
+  return error?.message || 'Ha ocurrido un error.';
+}
+
+function getFriendlyUserName(user, profileData) {
+  return profileData?.alias || user.displayName || user.email || "Sesión iniciada";
+}
+
+function updateAuthUi(user, profileData = null) {
+  const isLogged = !!user;
+  authStatus.innerHTML = isLogged
+    ? `<div class="auth-user-badge">Conectado como <span>${getFriendlyUserName(user, profileData)}</span></div>`
+    : "No has iniciado sesión todavía.";
+  btnToggleAuth.textContent = isLogged ? "Mi cuenta" : "Iniciar sesión";
+  btnMenuAccount.textContent = isLogged ? "Perfil" : "Iniciar sesión";
+  if (isLogged) authBox.classList.remove("open");
+  btnSaveHistory.style.display = isLogged ? "inline-flex" : "none";
+  btnToggleHistory.style.display = isLogged ? "inline-flex" : "none";
+  btnLogout.style.display = isLogged ? "inline-flex" : "none";
+  btnMenuLogout.style.display = isLogged ? "block" : "none";
+  btnMenuAccount.style.display = isLogged ? "none" : "block";
+  setHistoryButtonState();
+  checkExistingPeriodNotice();
+  if (!isLogged) {
+    closeHistoryCard();
+    historyMetricCount.textContent = '0';
+    historyMetricLastNet.textContent = window.formatEuro(0);
+    historyMetricAvgNet.textContent = window.formatEuro(0);
+    historyBody.innerHTML = '<tr><td colspan="9" class="muted">Inicia sesión para ver tu historial.</td></tr>'; if (historyPeonadasByYear) historyPeonadasByYear.innerHTML = '';  historyChartWrap.innerHTML = '<div class="history-chart-empty">Inicia sesión para ver la comparativa mensual.</div>';
+    btnDownloadCsv.style.display = 'none';
+    btnDownloadPdf.style.display = 'none';
+    closeAccountMenu();
+  }
+}
+
+async function loadProfile(user) {
+  const profileRef = doc(db, "users", user.uid, "profile", "main");
+  const snap = await getDoc(profileRef);
+  return snap.exists() ? snap.data() : null;
+}
+
+async function saveProfile(user, alias) {
+  const cleanAlias = String(alias || "").trim();
+  await setDoc(doc(db, "users", user.uid, "profile", "main"), {
+    alias: cleanAlias || user.displayName || user.email || "",
+    email: user.email || "",
+    updatedAt: new Date().toISOString()
+  }, { merge: true });
+}
+
+function recordToPayload() {
+  return {
+    periodo: $("periodoNomina").value,
+    form: window.getCurrentPayrollState(),
+    totals: window.getComputedData(),
+    summary: window.buildSummaryText(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+async function saveCurrentPayrollToCloud() {
+  const user = auth.currentUser;
+  if (!user) {
+    showAuthError("Inicia sesión para guardar tu nómina en el historial.");
+    authBox.classList.add("open");
+    return;
+  }
+  const periodo = $("periodoNomina").value;
+  if (!periodo) {
+    showAuthError("Indica primero el periodo de la nómina.");
+    return;
+  }
+  showAuthError("");
+  const payload = recordToPayload();
+  await setDoc(doc(db, "users", user.uid, "nominas", periodo), payload, { merge: true });
+  showSaveNotice("Nómina guardada en tu historial.");
+  openHistoryCard();
+  await renderHistory();
+  await checkExistingPeriodNotice();
+}
+
+
+
+function formatMonthType(monthType, row = null) {
+  const incidencias = Array.isArray(row?.form?.incidenciasItems) ? row.form.incidenciasItems : [];
+  return incidencias.length ? "Con incidencias" : "Normal";
+}
+
+async function checkExistingPeriodNotice() {
+  const warning = document.getElementById("periodOverwriteWarning");
+  const indicator = document.getElementById("currentPeriodIndicator");
+  const period = document.getElementById("periodoNomina")?.value || "";
+
+  if (!warning) return;
+  const user = auth?.currentUser;
+  if (!user || !period) {
+    warning.style.display = "none";
+    return;
+  }
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid, "nominas", period));
+    warning.style.display = snap.exists() ? "block" : "none";
+  } catch {
+    warning.style.display = "none";
+  }
+}
+
+function formatPeriod(periodo) {
+  if (!periodo || !/^\d{4}-\d{2}$/.test(periodo)) return periodo || "—";
+  const [y, m] = periodo.split("-");
+  return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m)-1, 1));
+}
+
+function setCalculatorVisibilityForHistory() {
+  const shouldHide = historyCard.classList.contains('open');
+  document.querySelectorAll('.month-type-card, .special-mode-card, .standard-mode-card, .incidences-card, .totals').forEach(el => {
+    el.style.display = shouldHide ? 'none' : '';
+  });
+}
+
+function setHistoryButtonState() {
+  btnToggleHistory.textContent = historyCard.classList.contains('open') ? 'Ocultar historial' : 'Historial';
+}
+function openHistoryCard() {
+  historyCard.classList.add('open');
+  setHistoryButtonState();
+  setCalculatorVisibilityForHistory();
+  historyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeHistoryCard() {
+  historyCard.classList.remove('open');
+  setHistoryButtonState();
+  setCalculatorVisibilityForHistory();
+}
+
+function buildNetBreakdown(totals) {
+  const bruto = Number(totals?.bruto || 0);
+  const neto = Number(totals?.neto || 0);
+  const ratio = bruto > 0 ? Math.max(0, Math.min(1, neto / bruto)) : 0;
+  return {
+    neto,
+    base: Number(totals?.base || 0) * ratio,
+    guardias: Number(totals?.guardias || 0) * ratio,
+    trasplante: Number(totals?.trasplante || 0) * ratio,
+    peonadas: Number(totals?.peonadas || 0) * ratio,
+    incidencias: Number(totals?.incidencias || 0) * ratio,
+    extras: Number(totals?.extras || 0) * ratio
+  };
+}
+
+function renderHistoryChart(rows) {
+  if (!rows || !rows.length) {  historyChartWrap.innerHTML = '<div class="history-chart-empty">Todavía no has guardado ninguna nómina.</div>';
+    return;
+  }
+  const ordered = [...rows].sort((a, b) => String(a.periodo || a.id).localeCompare(String(b.periodo || b.id)));
+  const breakdowns = ordered.map(row => ({
+    row,
+    parts: buildNetBreakdown(row.totals || {})
+  }));
+  const maxNet = Math.max(...breakdowns.map(item => item.parts.neto), 1);  historyChartWrap.innerHTML = breakdowns.map(({ row, parts }) => {
+
+    const totalHeight = Math.max(8, (parts.neto / maxNet) * 220);
+    const sumParts = parts.base + parts.guardias + parts.trasplante + parts.peonadas + parts.incidencias + parts.extras;
+    const safe = sumParts > 0 ? sumParts : 1;
+    const segs = [
+      ['seg-base', parts.base, 'Base + complementos'],
+      ['seg-guardias', parts.guardias, 'Guardias'],
+      ['seg-trasplante', parts.trasplante, 'Trasplante'],
+      ['seg-peonadas', parts.peonadas, 'Peonadas'],
+      ['seg-incidencias', parts.incidencias, 'Incidencias'],
+      ['seg-otros', parts.extras, 'Otros conceptos']
+    ].filter(([, value]) => value > 0);
+    const tooltip = [
+      formatPeriod(row.periodo || row.id),
+      `Neto: ${window.formatEuro(parts.neto)}`,
+      `Base + complementos: ${window.formatEuro(parts.base)}`,
+      `Guardias: ${window.formatEuro(parts.guardias)}`,
+      `Trasplante: ${window.formatEuro(parts.trasplante)}`,
+      `Peonadas: ${window.formatEuro(parts.peonadas)}`,
+      `Incidencias: ${window.formatEuro(parts.incidencias)}`,
+      `Otros conceptos: ${window.formatEuro(parts.extras)}`
+    ].join('\n');
+    const segHtml = segs.map(([cls, value, label]) => {
+      const h = Math.max(2, totalHeight * (value / safe));
+      return `<div class="chart-segment ${cls}" style="height:${h}px" title="${label}: ${window.formatEuro(value)}"></div>`;
+    }).join('');
+    return `
+      <div class="chart-col" title="${tooltip}">
+        <div class="chart-value-wrap"><div class="chart-value">${window.formatEuro(parts.neto)}</div></div>
+        <div class="chart-bar-shell">
+          <div class="chart-bar">${segHtml}</div>
+        </div>
+        <div class="chart-label">${formatPeriod(row.periodo || row.id)}</div>
+      </div>`;
+  }).join('');
+}
+
+
+function renderHistoryPeonadasByYear(rows) {
+  if (!historyPeonadasByYear) return;
+  const stats = {};
+  rows.forEach(row => {
+    const period = row.periodo || row.id || "";
+    const year = /^\d{4}-\d{2}$/.test(period) ? period.slice(0, 4) : "Sin año";
+    const items = Array.isArray(row?.form?.detailItems) ? row.form.detailItems : [];
+    items.forEach(item => {
+      const category = item.category || "Sin especialidad";
+      if (!stats[year]) stats[year] = {};
+      if (!stats[year][category]) stats[year][category] = { qty: 0, amount: 0 };
+      stats[year][category].qty += Number(item.qty || 0);
+      stats[year][category].amount += Number(item.total || 0);
+    });
+  });
+
+  const years = Object.keys(stats).sort((a, b) => b.localeCompare(a));
+  if (!years.length) {
+    historyPeonadasByYear.innerHTML = '<div class="year-peonadas-block"><div class="muted">Todavía no hay peonadas por detalle suficientes para generar estadísticas por especialidad. Las peonadas introducidas solo como importe manual no se pueden clasificar por especialidad.</div></div>';
+    return;
+  }
+
+  historyPeonadasByYear.innerHTML = years.map(year => {
+    const entries = Object.entries(stats[year]).sort((a, b) => b[1].amount - a[1].amount);
+    const totalQty = entries.reduce((sum, [, data]) => sum + data.qty, 0);
+    const totalAmount = entries.reduce((sum, [, data]) => sum + data.amount, 0);
+    const rowsHtml = entries.map(([category, data]) => `
+      <tr>
+        <td>${escapeHtml(category)}</td>
+        <td>${data.qty}</td>
+        <td><strong>${window.formatEuro(data.amount)}</strong></td>
+      </tr>
+    `).join("");
+    return `
+      <div class="year-peonadas-block">
+        <h3>Peonadas ${year}</h3>
+        <div class="sub">Resumen por especialidad a partir de las peonadas guardadas por detalle. Total anual: <strong>${window.formatEuro(totalAmount)}</strong> · Procedimientos: <strong>${totalQty}</strong></div>
+        <table class="year-peonadas-table">
+          <thead>
+            <tr>
+              <th>Especialidad</th>
+              <th>Procedimientos</th>
+              <th>Total ganado</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
+  }).join("");
+}
+
+async function renderHistory() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const q = query(collection(db, "users", user.uid, "nominas"), orderBy("periodo", "desc"), limit(60));
+  const snap = await getDocs(q);
+  if (snap.empty) {
+    historyMetricCount.textContent = '0';
+    historyMetricLastNet.textContent = window.formatEuro(0);
+    historyMetricAvgNet.textContent = window.formatEuro(0);
+    historyBody.innerHTML = '<tr><td colspan="9" class="muted">Todavía no has guardado ninguna nómina.</td></tr>'; if (historyPeonadasByYear) historyPeonadasByYear.innerHTML = '';
+    renderHistoryChart([]);
+    btnDownloadCsv.style.display = 'none';
+    btnDownloadPdf.style.display = 'none';
+    setHistoryButtonState();
+    return;
+  }
+  const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const nets = rows.map(r => Number(r?.totals?.neto || 0));
+  historyMetricCount.textContent = String(rows.length);
+  historyMetricLastNet.textContent = window.formatEuro(nets[0] || 0);
+  historyMetricAvgNet.textContent = window.formatEuro(nets.reduce((a,b)=>a+b,0) / rows.length);
+  renderHistoryChart(rows);
+  renderHistoryPeonadasByYear(rows);
+  btnDownloadCsv.style.display = 'inline-flex';
+  btnDownloadPdf.style.display = 'inline-flex';
+  setHistoryButtonState();
+  historyBody.innerHTML = rows.map(row => {
+    const t = row.totals || {};
+    return `
+      <tr>
+        <td>${formatPeriod(row.periodo || row.id)}</td>
+        <td>${formatMonthType(row.monthType, row)}</td>
+        <td>${window.formatEuro(t.bruto || 0)}</td>
+        <td>${window.formatEuro(t.guardias || 0)}</td>
+        <td>${window.formatEuro(t.peonadas || 0)}</td>
+        <td>${window.formatEuro(t.incidencias || 0)}</td>
+        <td>${window.formatEuro(t.extras || 0)}</td>
+        <td><strong>${window.formatEuro(t.neto || 0)}</strong></td>
+        <td><div class="history-actions"><button type="button" class="btn small secondary load-history" data-id="${row.id}">Editar</button><button type="button" class="btn small secondary delete-history" data-id="${row.id}" data-periodo="${row.periodo || row.id}">Borrar</button></div></td>
+      </tr>`;
+  }).join("");
+  historyBody.querySelectorAll('.load-history').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const snap = await getDoc(doc(db, "users", user.uid, "nominas", btn.dataset.id));
+      if (!snap.exists()) return;
+      const data = snap.data();
+      window.applyPayrollState(data.form || {});
+      if (data.periodo) $("periodoNomina").value = data.periodo;
+      closeHistoryCard();
+      showSaveNotice('Nómina cargada en la calculadora para editarla.');
+      document.querySelector('.hero').scrollIntoView({ top: 0, behavior: 'smooth' });
+    });
+  });
+  historyBody.querySelectorAll('.delete-history').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const periodLabel = formatPeriod(btn.dataset.periodo || btn.dataset.id);
+      const ok = window.confirm(`¿Seguro que quieres borrar la nómina de ${periodLabel} del historial?`);
+      if (!ok) return;
+      try {
+        await deleteDoc(doc(db, "users", user.uid, "nominas", btn.dataset.id));
+        await renderHistory();
+      } catch (err) {
+        window.alert('No se pudo borrar la nómina. Inténtalo de nuevo.');
+        console.error(err);
+      }
+    });
+  });
+}
+
+btnToggleAuth.addEventListener('click', () => {
+  const willOpen = !authBox.classList.contains('open');
+  authBox.classList.toggle('open');
+  if (willOpen) authBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showAuthError('');
+});
+btnAccountMenu.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleAccountMenu();
+});
+btnMenuAccount.addEventListener('click', () => {
+  closeAccountMenu();
+  btnToggleAuth.click();
+});
+btnMenuInstructions?.addEventListener('click', () => {
+  closeAccountMenu();
+  openModal(instructionsModal);
+});
+btnMenuTheme?.addEventListener('click', () => {
+  closeAccountMenu();
+  toggleTheme();
+});
+btnMenuLogout.addEventListener('click', () => {
+  closeAccountMenu();
+  btnLogout.click();
+});
+btnToggleHistory.addEventListener('click', async () => {
+  if (!auth.currentUser) return;
+  if (historyCard.classList.contains('open')) {
+    closeHistoryCard();
+    document.querySelector('.hero')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  openHistoryCard();
+  await renderHistory();
+});
+btnInstructions.addEventListener('click', () => openModal(instructionsModal));
+btnCloseInstructions.addEventListener('click', () => closeModal(instructionsModal));
+btnToggleTheme.addEventListener('click', toggleTheme);
+openPrivacyInline?.addEventListener('click', (e) => { e.preventDefault(); openModal(privacyModal); });
+openPrivacyFooter?.addEventListener('click', (e) => { e.preventDefault(); openModal(privacyModal); });
+btnClosePrivacy?.addEventListener('click', () => closeModal(privacyModal));
+instructionsModal.addEventListener('click', (e) => {
+  if (e.target === instructionsModal) closeModal(instructionsModal);
+});
+privacyModal.addEventListener('click', (e) => {
+  if (e.target === privacyModal) closeModal(privacyModal);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal(instructionsModal);
+    closeModal(privacyModal);
+    closeAccountMenu();
+  }
+});
+document.addEventListener('click', (e) => {
+  if (!accountMenu.contains(e.target) && e.target !== btnAccountMenu) {
+    closeAccountMenu();
+  }
+});
+btnSaveHistory.addEventListener('click', saveCurrentPayrollToCloud);
+btnDownloadCsv.addEventListener('click', downloadHistoryCsv);
+btnDownloadPdf.addEventListener('click', downloadHistoryPdf);
+btnLogout.addEventListener('click', async () => {
+  clearTransientPayrollState();
+  closeHistoryCard();
+  closeAccountMenu();
+  await signOut(auth);
+  showAuthError('');
+});
+
+$("btnRegisterEmail").addEventListener('click', async () => {
+  const alias = $("registerAlias").value.trim();
+  const email = $("registerEmail").value.trim();
+  const password = $("registerPassword").value;
+  if (!alias) return showAuthError('Escribe un alias para identificar tu cuenta.');
+  if (!email || !password) return showAuthError('Rellena email y contraseña.');
+  if (!$('acceptPrivacy').checked) return showAuthError('Debes aceptar la política de privacidad para crear la cuenta.');
+  try {
+    showAuthError('');
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: alias });
+    await saveProfile(cred.user, alias);
+    authBox.classList.remove('open');
+  } catch (e) {
+    showAuthError(explainAuthError(e));
+  }
+});
+
+$("btnLoginEmail").addEventListener('click', async () => {
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
+  if (!email || !password) return showAuthError('Rellena email y contraseña.');
+  try {
+    showAuthError('');
+    await signInWithEmailAndPassword(auth, email, password);
+    authBox.classList.remove('open');
+  } catch (e) {
+    showAuthError(explainAuthError(e));
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  try {
+    if (!user) {
+      clearTransientPayrollState();
+      updateAuthUi(null, null);
+      return;
+    }
+    sessionStorage.setItem(SESSION_RESTORE_KEY, "1");
+    const profile = await loadProfile(user);
+    updateAuthUi(user, profile);
+    await renderHistory();
+  } catch (e) {
+    console.error(e);
+    showAuthError('La sesión se inició, pero hubo un problema al cargar tus datos.');
+  }
+});
+
+applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+setHistoryButtonState();
+setCalculatorVisibilityForHistory();
+closeAccountMenu();
+
+window.saveCurrentPayrollToCloud = saveCurrentPayrollToCloud;
+window.renderHistory = renderHistory;
+</script>
+
+</body>
+</html>
